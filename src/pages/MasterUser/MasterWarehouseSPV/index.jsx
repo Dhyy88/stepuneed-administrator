@@ -62,10 +62,10 @@ const SPVWarehouses = () => {
 
   const getSite = async () => {
     try {
-      const store_response = await axios.get(ApiEndpoint.STORE_LIST);
+      const warehouse_response = await axios.get(ApiEndpoint.WAREHOUSE_LIST);
       const whstore_response = await axios.get(ApiEndpoint.STORE_WH_LIST);
       const site_response = [
-        ...store_response?.data?.data,
+        ...warehouse_response?.data?.data,
         ...whstore_response?.data?.data,
       ];
 
@@ -74,7 +74,7 @@ const SPVWarehouses = () => {
       Swal.fire("Gagal", error.response.data.message, "error");
     }
   };
-
+  
   const handleGenderChange = (selectedOption) => {
     setGender(selectedOption);
   };

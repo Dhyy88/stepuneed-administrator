@@ -365,10 +365,24 @@ const DetailSupplier = () => {
                               {item?.detail?.product_name_alias}
                             </td>
                             <td className="table-td">
-                              Rp {item?.price.toLocaleString("id-ID")}
+                              {item?.price ? (
+                                <span>
+                                  Rp {item?.price.toLocaleString("id-ID")}
+                                </span>
+                              ) : (
+                                <span>-</span>
+                              )}
                             </td>
+
                             <td className="table-td">
-                              Rp {item?.detail?.price.toLocaleString("id-ID")}
+                              {item?.detail?.price ? (
+                                <span>
+                                  Rp{" "}
+                                  {item?.detail?.price.toLocaleString("id-ID")}
+                                </span>
+                              ) : (
+                                <span>-</span>
+                              )}
                             </td>
                           </tr>
                         ))}

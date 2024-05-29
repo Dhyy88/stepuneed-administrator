@@ -118,7 +118,6 @@ const UpdateProduct = () => {
             setVariantName(productUid?.variant_type?.variant_name);
             setVariantOptions(productUid?.variant_type?.variant_options);
             setSelectedCarsByUid(productUid?.variant_type?.car_models || []);
-            // console.log(productUid?.variant_type?.car_models);
             setCheckIsVariant(true);
           } else {
             setCheckIsVariant(false);
@@ -157,6 +156,7 @@ const UpdateProduct = () => {
       console.error("Error fetching category label:", error);
     }
   };
+  
 
   useEffect(() => {
     if (category && selectedCategory.length > 0) {
@@ -289,7 +289,7 @@ const UpdateProduct = () => {
   useEffect(() => {
     const getCategory = () => {
       axios.get(ApiEndpoint.CATEGORIES).then((response) => {
-        setSelectedCategory(response.data.data);
+        setSelectedCategory(response?.data?.data);
       });
     };
 

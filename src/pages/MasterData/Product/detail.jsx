@@ -363,7 +363,10 @@ const DetailProducts = () => {
                                 Harga
                               </th>
                               <th scope="col" className=" table-th ">
-                                Atribut
+                                Atribut Varian
+                              </th>
+                              <th scope="col" className=" table-th ">
+                                Model Mobil
                               </th>
                               <th scope="col" className=" table-th ">
                                 Gambar Varian
@@ -398,7 +401,10 @@ const DetailProducts = () => {
                               Harga
                             </th>
                             <th scope="col" className=" table-th ">
-                              Atribut
+                              Atribut Varian
+                            </th>
+                            <th scope="col" className=" table-th ">
+                              Model Mobil
                             </th>
                             <th scope="col" className=" table-th ">
                               Gambar Varian
@@ -413,7 +419,13 @@ const DetailProducts = () => {
                             <tr key={index}>
                               <td className="table-td">{item?.sku}</td>
                               <td className="table-td">
-                                Rp {item?.price.toLocaleString("id-ID")}
+                                {item?.price ? (
+                                  <span>
+                                    Rp {item?.price.toLocaleString("id-ID")}
+                                  </span>
+                                ) : (
+                                  <span>-</span>
+                                )}
                               </td>
                               <td className="table-td">
                                 {item?.variant_attribute ? (
@@ -421,6 +433,11 @@ const DetailProducts = () => {
                                 ) : (
                                   <span>-</span>
                                 )}
+                              </td>
+                              <td className="table-td">
+                                {item?.car_model
+                                  ? item.car_model.model
+                                  : "-"}
                               </td>
                               <td className="table-td">
                                 {item?.image?.url ? (

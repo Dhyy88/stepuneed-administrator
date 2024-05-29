@@ -270,14 +270,15 @@ const CreateProduct = () => {
         throw new Error("error");
       }
     } catch (error) {
-      Swal.fire("Gagal", "Masukkan minimal 1 opsi variasi", "error");
+      const errorMessage = error?.response?.data?.message || "Masukkan minimal 1 variasi";
+      Swal.fire("Gagal", errorMessage, "error");
     }
   }
 
   useEffect(() => {
     const getCategory = () => {
       axios.get(ApiEndpoint.CATEGORIES).then((response) => {
-        setSelectedCategory(response.data.data);
+        setSelectedCategory(response?.data?.data);
       });
     };
 
@@ -789,10 +790,10 @@ const CreateProduct = () => {
                         <ul>
                           <div className="grid xl:grid-cols-10 md:grid-cols-10 grid-cols-1 gap-5 h-full ">
                             {data_cars?.map((car) => (
-                              <li key={car.uid} className="flex row ">
+                              <li key={car?.uid} className="flex row ">
                                 <Checkbox
-                                  value={selected_cars_by_uid.includes(car.uid)}
-                                  onChange={() => handleCheckboxChange(car.uid)}
+                                  value={selected_cars_by_uid.includes(car?.uid)}
+                                  onChange={() => handleCheckboxChange(car?.uid)}
                                 />
                                 {`${car?.full_name}`}
                               </li>

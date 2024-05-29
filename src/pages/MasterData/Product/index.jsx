@@ -22,11 +22,13 @@ const Products = () => {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [cars, setCars] = useState([]);
 
   const [query, setQuery] = useState({
     search: "",
     is_active: "",
     paginate: 5,
+    car_model: "",
   });
 
   async function getDataProducts(query) {
@@ -36,6 +38,7 @@ const Products = () => {
         page: query?.page,
         search: query?.search,
         is_active: query?.is_active,
+        car_model: query?.car_model,
         paginate: 8,
       });
       setData(response?.data?.data);
@@ -48,32 +51,11 @@ const Products = () => {
     setIsLoading(false);
   }
 
-  // async function onDelete(uid) {
-  //   try {
-  //     const result = await Swal.fire({
-  //       title: "Apakah anda yakin menghapus produk ini?",
-  //       text: "Anda tidak akan dapat mengembalikannya!",
-  //       icon: "warning",
-  //       showCancelButton: true,
-  //       confirmButtonText: "Ya, Hapus",
-  //       cancelButtonText: "Batal",
-  //     });
-
-  //     if (result.isConfirmed) {
-  //       await axios.delete(`${ApiEndpoint.PRODUCTS}/${uid}`);
-  //       Swal.fire(
-  //         "Berhasil!",
-  //         "Anda berhasil menghapus data produk ini.",
-  //         "success"
-  //       );
-  //       getDataProducts(query);
-  //     } else {
-  //       Swal.fire("Batal", "Hapus data produk dibatalkan.", "info");
-  //     }
-  //   } catch (err) {
-  //     Swal.fire("Gagal", err.response.data.message, "error");
-  //   }
-  // }
+  const getCars = () => {
+    axios.get(ApiEndpoint.CARS).then((response) => {
+      setCars(response?.data?.data);
+    });
+  };
 
   const handlePrevPagination = () => {
     if (data.prev_page_url) {
@@ -115,6 +97,10 @@ const Products = () => {
     getDataProducts(query);
   }, [query]);
 
+  useEffect(() => {
+    getCars();
+  }, []);
+
   return (
     <>
       <div className="grid grid-cols-12 gap-6">
@@ -133,6 +119,22 @@ const Products = () => {
               <div className="md:flex items-center gap-3">
                 <div className="row-span-3 md:row-span-4">
                   <select
+                    className="form-control py-2 "
+                    value={query.car_model}
+                    onChange={(event) =>
+                      setQuery({ ...query, car_model: event.target.value })
+                    }
+                  >
+                    <option value="">Semua Jenis Mobil</option>
+                    {cars?.map((item) => (
+                      <option key={item.uid} value={item.uid}>
+                        {item.model}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="row-span-3 md:row-span-4">
+                  <select
                     className="form-control py-2 w-max"
                     value={query.is_active}
                     onChange={(event) =>
@@ -144,6 +146,7 @@ const Products = () => {
                     <option value="0">Nonaktif</option>
                   </select>
                 </div>
+
                 <div className="row-span-3 md:row-span-4">
                   <Textinput
                     // value={query || ""}
@@ -168,6 +171,9 @@ const Products = () => {
                             </th>
                             <th scope="col" className=" table-th ">
                               Slug Produk
+                            </th>
+                            <th scope="col" className=" table-th ">
+                              Model Mobil
                             </th>
                             <th scope="col" className=" table-th ">
                               Status
@@ -196,6 +202,9 @@ const Products = () => {
                             </th>
                             <th scope="col" className=" table-th ">
                               Slug Produk
+                            </th>
+                            <th scope="col" className=" table-th ">
+                              Model Mobil
                             </th>
                             <th scope="col" className=" table-th ">
                               Status
@@ -234,6 +243,9 @@ const Products = () => {
                             Slug Produk
                           </th>
                           <th scope="col" className=" table-th ">
+                            Model Mobil
+                          </th>
+                          <th scope="col" className=" table-th ">
                             Status
                           </th>
                           <th scope="col" className=" table-th ">
@@ -249,6 +261,13 @@ const Products = () => {
                           <tr key={index}>
                             <td className="table-td">{item?.name} </td>
                             <td className="table-td">{item?.slug}</td>
+                            <td className="table-td">
+                              {item?.car_models && item.car_models.length > 0
+                                ? item.car_models
+                                    .map((model) => model.model)
+                                    .join(", ")
+                                : "-"}
+                            </td>
                             <td className="table-td">
                               {item?.is_active === true ? (
                                 <span className="inline-block px-3 min-w-[90px] text-center mx-auto py-1 rounded-[999px] bg-opacity-25 text-success-500 bg-success-500">

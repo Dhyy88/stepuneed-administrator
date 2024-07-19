@@ -6,13 +6,15 @@ import Tooltip from "@/components/ui/Tooltip";
 import Swal from "sweetalert2";
 import Button from "@/components/ui/Button";
 import Select from "react-select";
+
+import { useNavigate } from "react-router-dom";
 import ApiEndpoint from "../../../API/Api_EndPoint";
 import axios from "../../../API/Axios";
 import Loading from "../../../components/Loading";
 import LoadingButton from "../../../components/LoadingButton";
 import Switch from "@/components/ui/Switch";
 
-const SPVWarehouses = () => {
+const Cashiers = () => {
   const [data, setData] = useState({
     data: [],
     current_page: 1,
@@ -44,7 +46,7 @@ const SPVWarehouses = () => {
   async function getDataWarehouse(query) {
     setIsLoading(true);
     try {
-      const response = await axios.post(ApiEndpoint.SPV_WH, {
+      const response = await axios.post(ApiEndpoint.WAREHOUSE, {
         page: query?.page,
         search: query?.search,
         gender: query?.gender,
@@ -60,6 +62,10 @@ const SPVWarehouses = () => {
     }
   }
 
+  useEffect(() => {
+    getDataWarehouse(query);
+  }, [query]);
+
   const getSite = async () => {
     try {
       const warehouse_response = await axios.get(ApiEndpoint.WAREHOUSE_LIST);
@@ -74,7 +80,7 @@ const SPVWarehouses = () => {
       Swal.fire("Gagal", error.response.data.message, "error");
     }
   };
-  
+
   const handleGenderChange = (selectedOption) => {
     setGender(selectedOption);
   };
@@ -83,7 +89,7 @@ const SPVWarehouses = () => {
     setIsLoadingButton(true);
     const confirmResult = await Swal.fire({
       title: "Konfirmasi",
-      text: "Anda yakin ingin menambahkan data pengguna spv ini?",
+      text: "Anda yakin ingin menambahkan data pengguna ini?",
       icon: "question",
       showCancelButton: true,
       confirmButtonText: "Ya, Tambahkan",
@@ -92,7 +98,7 @@ const SPVWarehouses = () => {
 
     if (confirmResult.isConfirmed) {
       try {
-        await axios.post(ApiEndpoint.CREATE_SPV_WH, {
+        await axios.post(ApiEndpoint.CREATE_WAREHOUSE, {
           site: selectedSite?.value,
           email: email,
           first_name: first_name,
@@ -101,7 +107,7 @@ const SPVWarehouses = () => {
           phone_number: phone_number,
           birth: birth,
         });
-        Swal.fire("Sukses", "Data pengguna spv gudang berhasil ditambahkan.", "success");
+        Swal.fire("Sukses", "Data pengguna berhasil ditambahkan.", "success");
         getDataWarehouse(query);
         resetForm();
         setIsLoadingButton(false);
@@ -143,7 +149,7 @@ const SPVWarehouses = () => {
         });
 
         if (input && input.trim().toLowerCase() === "hapus") {
-          await axios.delete(`${ApiEndpoint.SPV_WH}/${uid}`);
+          await axios.delete(`${ApiEndpoint.WAREHOUSE}/${uid}`);
           Swal.fire(
             "Berhasil!",
             "Anda berhasil menghapus data akun ini.",
@@ -157,7 +163,7 @@ const SPVWarehouses = () => {
     } catch (err) {
       Swal.fire("Gagal", err.response.data.message, "error");
     }
-  };
+  }
 
   async function handleChangeStatus(uid) {
     try {
@@ -180,7 +186,7 @@ const SPVWarehouses = () => {
 
       if (confirmation.isConfirmed) {
         const response = await axios.get(
-          `${ApiEndpoint.SPV_WH}/${uid}/toggle-active`,
+          `${ApiEndpoint.WAREHOUSE}/${uid}/toggle-active`,
           payload
         );
         setIsActive(!is_active);
@@ -228,10 +234,6 @@ const SPVWarehouses = () => {
 
     return pageNumbers;
   };
-  
-  useEffect(() => {
-    getDataWarehouse(query);
-  }, [query]);
 
   useEffect(() => {
     getSite();
@@ -252,7 +254,7 @@ const SPVWarehouses = () => {
     <>
       <div className="grid grid-cols-12 gap-6">
         <div className="lg:col-span-8 col-span-12">
-          <Card title="Data SPV Admin Gudang ">
+          <Card title="Data Admin Gudang ">
             <div className="flex items-center mb-4 justify-between ">
               <div className="flex items-center gap-3">
                 <div className="row-span-3 md:row-span-4 mb-2">
@@ -306,7 +308,7 @@ const SPVWarehouses = () => {
                     onChange={(event) =>
                       setQuery({ ...query, search: event.target.value })
                     }
-                    placeholder="Cari spv gudang..."
+                    placeholder="Cari pengguna gudang..."
                   />
                 </div>
               </div>
@@ -471,7 +473,19 @@ const SPVWarehouses = () => {
                             ) : (
                               <td className="table-td">-</td>
                             )}
-                              <td className="table-td">
+                            {/* <td className="table-td">
+                              {item?.is_active === true ? (
+                                <span className="inline-block px-3 min-w-[90px] text-center mx-auto py-1 rounded-[999px] bg-opacity-25 text-success-500 bg-success-500">
+                                  Aktif
+                                </span>
+                              ) : (
+                                <span className="inline-block px-3 min-w-[90px] text-center mx-auto py-1 rounded-[999px] bg-opacity-25 text-danger-500 bg-danger-500">
+                                  Nonaktif
+                                </span>
+                              )}
+                            </td> */}
+
+                            <td className="table-td">
                               <Switch
                                 label={item?.is_active ? "Aktif" : "Nonaktif"}
                                 activeClass="bg-success-500"
@@ -565,7 +579,7 @@ const SPVWarehouses = () => {
           </Card>
         </div>
         <div className="lg:col-span-4 col-span-12">
-          <Card title={"Tambah SPV Admin Gudang"}>
+          <Card title={"Tambah Admin Gudang"}>
             <div className="text-sm text-slate-600 font-normal bg-white dark:bg-slate-900 dark:text-slate-300 rounded p-5">
               <div className="text-base text-slate-600 dark:text-slate-300 mb-4">
                 <label htmlFor=" hh" className="form-label ">
@@ -711,4 +725,4 @@ const SPVWarehouses = () => {
   );
 };
 
-export default SPVWarehouses;
+export default Cashiers;

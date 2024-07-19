@@ -30,6 +30,7 @@ const Categories = () => {
     level: 1,
   });
   const [name, setName] = useState("");
+  const [alias, setAlias] = useState("");
   const [editMode, setEditMode] = useState(false);
 
   const [parentOptions, setParentOptions] = useState([]);
@@ -89,7 +90,7 @@ const Categories = () => {
               </td>
 
               <td className="table-td">{category.name}</td>
-              <td className="table-td">{category.slug}</td>
+              <td className="table-td">{category.alias}</td>
               <td className="table-td">
                 <div className="flex space-x-3 rtl:space-x-reverse">
                   <Tooltip
@@ -159,11 +160,13 @@ const Categories = () => {
       const formData = new FormData();
       formData.append("category_parent", select);
       formData.append("name", name);
+      formData.append("alias", alias);
 
       try {
         await axios.post(ApiEndpoint.CREATE_CATEGORY, formData);
 
         setName("");
+        setAlias("");
         setSelect("");
 
         Swal.fire({
@@ -231,6 +234,7 @@ const Categories = () => {
       const editedCategory = response.data.data;
 
       setName(editedCategory.name);
+      setAlias(editedCategory.alias);
       setSelect(editedCategory.category_uid);
 
       setData({ ...data, uid: editedCategory.uid });
@@ -258,11 +262,13 @@ const Categories = () => {
       const formData = new FormData();
       formData.append("category_parent", select);
       formData.append("name", name);
+      formData.append("alias", alias);
 
       try {
         await axios.post(`${ApiEndpoint.CATEGORY}/${data.uid}`, formData);
 
         setName("");
+        setAlias("");
         setSelect("");
 
         Swal.fire({
@@ -324,6 +330,7 @@ const Categories = () => {
 
   const resetForm = () => {
     setName("");
+    setAlias("");
     setSelect(null);
     setEditMode(false);
   };
@@ -398,7 +405,7 @@ const Categories = () => {
                               Nama Kategori
                             </th>
                             <th scope="col" className=" table-th ">
-                              Slug Kategori
+                              Alias Kategori
                             </th>
                             <th scope="col" className=" table-th ">
                               Aksi
@@ -421,7 +428,7 @@ const Categories = () => {
                               Nama Kategori
                             </th>
                             <th scope="col" className=" table-th ">
-                              Slug Kategori
+                              Alias Kategori
                             </th>
                             <th scope="col" className=" table-th ">
                               Aksi
@@ -449,10 +456,10 @@ const Categories = () => {
                         <tr>
                           <th scope="col" className=" table-th "></th>
                           <th scope="col" className=" table-th ">
-                              Nama Kategori
-                            </th>
+                            Nama Kategori
+                          </th>
                           <th scope="col" className=" table-th ">
-                            Slug Kategori
+                            Alias Kategori
                           </th>
                           <th scope="col" className=" table-th ">
                             Aksi
@@ -565,6 +572,20 @@ const Categories = () => {
                 {error && (
                   <span className="text-danger-600 text-xs py-2">
                     {error?.errors?.name}
+                  </span>
+                )}
+              </div>
+              <div className="text-base text-slate-600 dark:text-slate-300 mb-4">
+                <Textinput
+                  label="Alias Kategori *"
+                  type="text"
+                  placeholder="Masukkan alias kategori"
+                  onChange={(e) => setAlias(e.target.value)}
+                  value={alias}
+                />
+                {error && (
+                  <span className="text-danger-600 text-xs py-2">
+                    {error?.errors?.alias}
                   </span>
                 )}
               </div>

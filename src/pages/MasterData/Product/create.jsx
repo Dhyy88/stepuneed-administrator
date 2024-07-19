@@ -5,12 +5,12 @@ import ApiEndpoint from "../../../API/Api_EndPoint";
 import axios from "../../../API/Axios";
 import "swiper/swiper-bundle.min.css";
 import Textinput from "@/components/ui/Textinput";
+import Select2 from "react-select";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import Fileinput from "@/components/ui/Fileinput";
 import Switch from "@/components/ui/Switch";
 import Button from "@/components/ui/Button";
-import Checkbox from "@/components/ui/Checkbox";
 import Swal from "sweetalert2";
 import { Modal, Select } from "antd";
 import { TreeSelect, Space } from "@arco-design/web-react";
@@ -21,58 +21,88 @@ import { useNavigate } from "react-router-dom";
 
 const CreateProduct = () => {
   const navigate = useNavigate();
-  const [data_cars, setDataCars] = useState({
-    data_cars: [],
-    current_page: 1,
-    last_page: 1,
-    prev_page_url: null,
-    next_page_url: null,
-  });
-  const [data_variant_generator, setDataVariantGenerator] = useState([]);
-  const [query, setQuery] = useState({
-    search: "",
-    is_active: "",
-    paginate: 9999,
-  });
 
+  const [data_variant_generator, setDataVariantGenerator] = useState([]);
+
+  const [brand, setBrand] = useState(null);
   const [category, setCategory] = useState("");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [min_order, setMinOrder] = useState("1");
-  const [warranty, setWarranty] = useState("");
+  const [length, setLength] = useState("");
+  const [width, setWidth] = useState("");
+  const [height, setHeight] = useState("");
+  const [gender, setGender] = useState(null);
+
   const [is_active, setIsActive] = useState(false);
   const [primary_image, setPrimaryImage] = useState(null);
   const [images, setImages] = useState([]);
-  const [variant_name, setVariantName] = useState("");
-  const [variant_options, setVariantOptions] = useState([]);
   const [error, setError] = useState("");
-  const [car_models, setCarModel] = useState("");
+
   const [variants, setVariants] = useState([
     {
       sku: "",
-      price: "",
+      barcode: "",
+      buy_price: "",
+      sell_price: "",
+      weight: "",
       is_primary: false,
-      image: null,
     },
   ]);
-  const [price, setPrice] = useState([]);
+  const [barcode, setBarcode] = useState([]);
   const [sku, setSku] = useState([]);
-  const [check_is_variant, setCheckIsVariant] = useState(false); // VARIANT SET STATE
-  const [check_is_primary_variant, setCheckPrimaryVariant] = useState(false); // STATE VARIANT PRIMARY
-  const [variantCarStatus, setVariantCarStatus] = useState(true);
+  const [buy_price, setBuyPrice] = useState([]);
+  const [sell_price, setSellPrice] = useState([]);
+  const [weight, setWeight] = useState([]);
+
+  const [variant_type_one, setVariantTypeOne] = useState("");
+  const [variant_type_two, setVariantTypeTwo] = useState("");
+  const [variant_option_one, setVariantOptionOne] = useState([]);
+  const [variant_option_two, setVariantOptionTwo] = useState([]);
+
+  const [check_is_variant, setCheckIsVariant] = useState(false);
+  const [check_is_primary_variant, setCheckPrimaryVariant] = useState(false);
+
   const [disabledForms, setDisabledForms] = useState([false]);
   const [selectedCategory, setSelectedCategory] = useState([]);
   const [visibleSubCategories, setVisibleSubCategories] = useState({});
   const [treeData, setTreeData] = useState([]);
   const [isSubmitGenerator, setIsSubmitGenerator] = useState(false);
   const [variant_generator_data, setIsVariantGeneratorData] = useState(null);
-  const [selected_cars_by_uid, setSelectedCarsByUid] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [commonPrice, setCommonPrice] = useState("");
-  const [isModalOpenCars, setIsModalOpenCars] = useState(false);
 
-  const handleOpenModalCars = () => {
-    setIsModalOpenCars(true);
+  const [selectedBrand, setSelectedBrand] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [commonBuyPrice, setCommonBuyPrice] = useState("");
+  const [commonSellPrice, setCommonSellPrice] = useState("");
+  const [commonWeight, setCommonWeight] = useState("");
+
+  const typeGender = [
+    { value: "man", label: "Pria Dewasa" },
+    { value: "woman", label: "Wanita Dewasa" },
+    { value: "kids", label: "Anak Kecil" },
+    { value: "boy", label: "Anak Laki-laki" },
+    { value: "girl", label: "Anak Perempuan" },
+    { value: "unisex", label: "Semua Gender" },
+  ];
+
+  const typeVariant = [
+    { value: "Warna", label: "Warna" },
+    { value: "Ukuran", label: "Ukuran" },
+  ];
+
+  const filteredTypeVariantTwo = typeVariant.filter(
+    (option) => option.value !== variant_type_one?.value
+  );
+
+  const filteredTypeVariantOne = typeVariant.filter(
+    (option) => option.value !== variant_type_two?.value
+  );
+
+  const getBrand = () => {
+    axios.get(ApiEndpoint.BRANDS).then((response) => {
+      setBrand(response?.data?.data);
+    });
   };
 
   const handleFileChangePrimary = (e) => {
@@ -83,6 +113,14 @@ const CreateProduct = () => {
     const files = e.target.files;
     const filesArray = Array.from(files).map((file) => file);
     setImages(filesArray);
+  };
+
+  const handleSelectFirstVariant = (selected) => {
+    setVariantOptionOne(selected);
+  };
+
+  const handleSelectSecondVariant = (selected) => {
+    setVariantOptionTwo(selected);
   };
 
   const mapSelectedCategoryToTreeData = (category) => {
@@ -124,41 +162,60 @@ const CreateProduct = () => {
     return title.toLowerCase().includes(input.toLowerCase());
   };
 
-  const handleSkuChange = (value, index) => {
-    const updatedSku = [...sku];
-    updatedSku[index] = value;
-    setSku(updatedSku);
+  const applyCommonPrices = () => {
+    const updatedVariants = variant_generator_data.map((variantGroup, index) => ({
+      ...variants[index],
+      buy_price: commonBuyPrice,
+      sell_price: commonSellPrice,
+      weight: commonWeight
+    }));
+  
+    const updatedBuyPrices = new Array(variant_generator_data.length).fill(commonBuyPrice);
+    const updatedSellPrices = new Array(variant_generator_data.length).fill(commonSellPrice);
+    const updatedWeights = new Array(variant_generator_data.length).fill(commonWeight);
+  
+    setVariants(updatedVariants);
+    setBuyPrice(updatedBuyPrices);
+    setSellPrice(updatedSellPrices);
+    setWeight(updatedWeights);
+  };
+
+  const handleBarcodeChange = (value, index) => {
+    const updatedBarcode = [...barcode];
+    updatedBarcode[index] = value;
+    setBarcode(updatedBarcode);
+
+    const updatedVariants = [...variants];
+    updatedVariants[index] = { ...updatedVariants[index], barcode: value };
+    setVariants(updatedVariants);
+  };
+
+  const handleSKUChange = (value, index) => {
+    const updateSKU = [...sku];
+    updateSKU[index] = value;
+    setSku(updateSKU);
 
     const updatedVariants = [...variants];
     updatedVariants[index] = { ...updatedVariants[index], sku: value };
     setVariants(updatedVariants);
   };
 
-  const handlePriceChange = (value, index) => {
-    const updatedPrice = [...price];
-    updatedPrice[index] = value;
-    setPrice(updatedPrice);
-
-    const updatedVariants = [...variants];
-    updatedVariants[index] = { ...updatedVariants[index], price: value };
-    setVariants(updatedVariants);
+  const handleBuyPriceChange = (value, index) => {
+    const updateBuyPrice = [...buy_price];
+    updateBuyPrice[index] = value;
+    setBuyPrice(updateBuyPrice);
   };
 
-  const handleFileChangeVariantImages = (e, index) => {
-    const files = e.target.files;
-    const file = files[0];
+  const handleSellPriceChange = (value, index) => {
+    const updateSellPrice = [...sell_price];
+    updateSellPrice[index] = value;
+    setSellPrice(updateSellPrice);
+  };
 
-    if (!variants[index]) {
-      return;
-    }
-
-    const updatedVariants = [...variants];
-    updatedVariants[index] = {
-      ...updatedVariants[index],
-      image: file,
-    };
-
-    setVariants(updatedVariants);
+  const handleWeightChange = (value, index) => {
+    const updateWeight = [...weight];
+    updateWeight[index] = value;
+    setWeight(updateWeight);
   };
 
   const handlePrimaryVariantChange = (index) => {
@@ -172,42 +229,6 @@ const CreateProduct = () => {
     setVariants(updatedVariants);
   };
 
-  const handleCheckboxChange = (carModelUid) => {
-    const updatedCarModels = selected_cars_by_uid.includes(carModelUid)
-      ? selected_cars_by_uid.filter((uid) => uid !== carModelUid)
-      : [...selected_cars_by_uid, carModelUid];
-
-    setSelectedCarsByUid(updatedCarModels);
-  };
-
-  const onSubmitCars = async () => {
-    try {
-      setIsModalOpenCars(false);
-      if (selected_cars_by_uid.length > 0) {
-        setCarModel(selected_cars_by_uid);
-      }
-    } catch (error) {
-      Swal.fire("Error", "Gagal memilih data mobil", "error");
-    }
-  };
-
-  const onResetCheckCars = async () => {
-    setSelectedCarsByUid([]);
-  };
-
-  const handleCancelModalCars = () => {
-    setIsModalOpenCars(false);
-  };
-
-  const handleSelectChange = (selected) => {
-    setVariantOptions(selected);
-    const initialStatus = selected.reduce((acc, option) => {
-      acc[option] = true;
-      return acc;
-    }, {});
-    setVariantCarStatus(initialStatus);
-  };
-
   const handleKeyDown = (event) => {
     if (event.key === "Enter" && event.target.value) {
       const newTag = { label: event.target.value, value: event.target.value };
@@ -218,46 +239,26 @@ const CreateProduct = () => {
 
   const onSetupVariants = async () => {
     try {
-      await handleVariantGenerator(selected_cars_by_uid);
+      await handleVariantGenerator();
       setIsSubmitGenerator(true);
-      // setSelectedCarsByUid([]);
     } catch (error) {
       Swal.fire("Error", "Gagal mengatur variasi", "error");
     }
   };
 
-  async function getDataCars(query) {
+  async function handleVariantGenerator() {
     try {
-      const response = await axios.post(ApiEndpoint.CARS, {
-        page: query?.page,
-        paginate: query?.paginate,
-        search: query?.search,
-      });
-      setDataCars(response?.data?.data?.data);
-      // setIsModalOpenCars(true);
-    } catch (error) {
-      Swal.fire("Gagal", "Gagal memuat data mobil", "error");
-    }
-  }
-
-  useEffect(() => {
-    getDataCars(query);
-  }, [query]);
-
-  async function handleVariantGenerator(selectedCars) {
-    try {
-      if (variant_options.length || selectedCars.length) {
+      if (variant_option_one.length || variant_option_two.length) {
         const requestData = {};
-        if (variant_options.length) {
-          requestData.variant_name = variant_name;
 
-          if (variant_options.length > 0) {
-            requestData.variant_options = variant_options || [];
-          }
+        if (variant_option_one.length) {
+          requestData.variant_type_one = variant_type_one?.value;
+          requestData.variant_option_one = variant_option_one || [];
         }
 
-        if (selectedCars.length > 0) {
-          requestData.car_models = selectedCars;
+        if (variant_option_two.length) {
+          requestData.variant_type_two = variant_type_two?.value;
+          requestData.variant_option_two = variant_option_two || [];
         }
 
         const response = await axios.post(
@@ -270,8 +271,7 @@ const CreateProduct = () => {
         throw new Error("error");
       }
     } catch (error) {
-      const errorMessage = error?.response?.data?.message || "Masukkan minimal 1 variasi";
-      Swal.fire("Gagal", errorMessage, "error");
+      Swal.fire("Gagal", "Masukkan minimal 1 opsi variasi", "error");
     }
   }
 
@@ -283,6 +283,10 @@ const CreateProduct = () => {
     };
 
     getCategory();
+  }, []);
+
+  useEffect(() => {
+    getBrand();
   }, []);
 
   useEffect(() => {
@@ -304,66 +308,72 @@ const CreateProduct = () => {
     const is_variant = check_is_variant ? true : false;
 
     const formData = new FormData();
+    formData.append("brand", selectedBrand?.value || "");
     formData.append("category", category);
     formData.append("name", name);
     formData.append("description", description);
     formData.append("min_order", min_order);
-    formData.append("warranty", warranty);
+    formData.append("gender", gender?.value || "");
+    formData.append("length", length);
+    formData.append("width", width);
+    formData.append("height", height);
     formData.append("is_active", active);
     formData.append("check_is_variant", is_variant);
 
     const updatedVariants = variants.map((variant, index) => ({
       ...variant,
-      price: price[index] || "",
       sku: sku[index] || "",
-      image: variants[index].image,
+      barcode: barcode[index] || "",
+      buy_price: buy_price[index] || "",
+      sell_price: sell_price[index] || "",
+      weight: weight[index] || "",
       is_primary: variants[index].is_primary,
     }));
 
     if (check_is_variant) {
-      formData.append("variant_name", variant_name);
-      for (let i = 0; i < variant_options.length; i++) {
-        formData.append("variant_options[]", variant_options[i]);
+      formData.append("variant_type_one", variant_type_one?.value || "");
+      for (let i = 0; i < variant_option_one.length; i++) {
+        formData.append("variant_option_one[]", variant_option_one[i]);
       }
-      for (let i = 0; i < car_models.length; i++) {
-        formData.append("car_models[]", car_models[i]);
+
+      if (variant_option_two.length > 0) {
+        formData.append("variant_type_two", variant_type_two?.value || "");
+        for (let i = 0; i < variant_option_two.length; i++) {
+          formData.append("variant_option_two[]", variant_option_two[i]);
+        }
       }
 
       updatedVariants.forEach((variant, index) => {
         formData.append(`variants[${index}][sku]`, variant.sku || "");
-        formData.append(`variants[${index}][price]`, variant.price || "");
+        formData.append(`variants[${index}][barcode]`, variant.barcode || "");
+        formData.append(`variants[${index}][buy_price]`, variant.buy_price || "");
+        formData.append(`variants[${index}][sell_price]`, variant.sell_price || "");
+        formData.append(`variants[${index}][weight]`, variant.weight || "");
         formData.append(
           `variants[${index}][is_primary]`,
           variant.is_primary ? 1 : 0
         );
 
-        if (variant && variant.image) {
-          formData.append(`variants[${index}][image]`, variant.image);
-        }
-
-        if (variant && variant_generator_data[index]?.variant?.option) {
-          formData.append(
-            `variants[${index}][variant_option]`,
-            variant_generator_data[index]?.variant?.option || ""
-          );
-        }
-
-        if (variant && variant_generator_data[index]?.car_model?.uid) {
-          formData.append(
-            `variants[${index}][car_model]`,
-            variant_generator_data[index]?.car_model?.uid || ""
-          );
+        if (variant_generator_data[index]) {
+          variant_generator_data[index].forEach((option) => {
+            if (option.type === variant_type_one?.value) {
+              formData.append(`variants[${index}][variant_one]`, option.option);
+            }
+            if (option.type === variant_type_two?.value) {
+              formData.append(`variants[${index}][variant_two]`, option.option);
+            }
+          });
         }
       });
     } else {
-      // formData.append(`variants[0][sku]`, sku || "");
-      // formData.append(`variants[0][price]`, price || "");
       formData.append("sku", sku);
-      formData.append("price", price);
+      formData.append("barcode", barcode);
+      formData.append("buy_price", buy_price);
+      formData.append("sell_price", sell_price);
+      formData.append("weight", weight);
     }
 
     formData.append("primary_image", primary_image || "");
-
     for (let i = 0; i < images.length; i++) {
       formData.append("images[]", images[i]);
     }
@@ -383,22 +393,12 @@ const CreateProduct = () => {
             `${ApiEndpoint.CREATE_PRODUCTS}`,
             formData
           );
-          if (response.status === 200) {
-            Swal.fire("Berhasil", "Produk telah ditambahkan", "success");
-            setIsLoading(false);
-            navigate("/products");
-          } else {
-            setValidation("Terjadi kesalahan saat mengirim data");
-            Swal.fire({
-              icon: "error",
-              title: "Oops...",
-              text: "Terjadi kesalahan saat mengirim data",
-            });
-            setIsLoading(false);
-          }
+          Swal.fire("Berhasil", "Produk telah ditambahkan", "success");
+          setIsLoading(false);
+          navigate("/products");
         } catch (error) {
-          setError(error.response.data.errors);
-          Swal.fire("Gagal", "Terjadi kesalahan saat mengirim data", "error");
+          setError(error?.response?.data?.message);
+          Swal.fire("Gagal", error?.response?.data?.message, "error");
           setIsLoading(false);
         }
       } else {
@@ -412,6 +412,8 @@ const CreateProduct = () => {
   const previousPage = () => {
     navigate(-1);
   };
+
+  
 
   return (
     <div className="lg:col-span-12 col-span-12">
@@ -477,6 +479,25 @@ const CreateProduct = () => {
             </div>
           )}
         </div>
+        <div className="grid xl:grid-cols-1 md:grid-cols-1 grid-cols-1 gap-5 mb-5">
+          <div className="">
+            <label htmlFor=" hh" className="form-label ">
+              Brand Produk *
+            </label>
+            <Select2
+              className="react-select mt-2"
+              classNamePrefix="select"
+              placeholder="Pilih Brand *"
+              options={brand?.map((item) => ({
+                value: item.uid,
+                label: item.name,
+              }))}
+              onChange={(selectedOption) => setSelectedBrand(selectedOption)}
+              value={selectedBrand}
+              isClearable
+            />
+          </div>
+        </div>
         <div className="grid xl:grid-cols-3 md:grid-cols-3 grid-cols-1 gap-5 mb-5">
           <div className="">
             <Textinput
@@ -510,23 +531,47 @@ const CreateProduct = () => {
             )}
           </div>
           <div className="">
-            <Textinput
-              type="number"
-              label="Garansi produk (optional) "
-              placeholder="Garansi produk berupa angka per bulan"
-              value={warranty}
-              onChange={(e) => {
-                const value = e.target.value;
-                if (value === "" || (!isNaN(value) && parseFloat(value) >= 0)) {
-                  setWarranty(value);
-                }
-              }}
+            <label htmlFor="for_gender" className="form-label">
+              Jenis Kelamin *
+            </label>
+            <Select2
+              className="react-select mt-2"
+              classNamePrefix="select"
+              placeholder="Pilih Jenis Kelamin..."
+              options={typeGender}
+              value={gender}
+              onChange={(selectedOption) => setGender(selectedOption)}
+              isClearable
             />
-            {error && (
-              <span className="text-danger-600 text-xs py-2">
-                {error.warranty}
-              </span>
-            )}
+          </div>
+        </div>
+        <div className="grid xl:grid-cols-3 md:grid-cols-3 grid-cols-1 gap-5 mb-5">
+          <div className="">
+            <Textinput
+              type="text"
+              label="Panjang ( Optional )"
+              placeholder="Panjang produk ( sentimeter )"
+              value={length}
+              onChange={(e) => setLength(e.target.value)}
+            />
+          </div>
+          <div className="">
+            <Textinput
+              type="text"
+              label="Lebar ( Optional )"
+              placeholder="Lebar produk ( sentimeter )"
+              value={width}
+              onChange={(e) => setWidth(e.target.value)}
+            />
+          </div>
+          <div className="">
+            <Textinput
+              type="text"
+              label="Tinggi ( Optional )"
+              placeholder="Tinggi produk ( sentimeter )"
+              value={height}
+              onChange={(e) => setHeight(e.target.value)}
+            />
           </div>
         </div>
         <div className="grid xl:grid-cols-1 md:grid-cols-1 grid-cols-1 gap-5 mb-5">
@@ -598,31 +643,6 @@ const CreateProduct = () => {
                 ],
               }}
             />
-            {/* <CKEditor
-              editor={ClassicEditor}
-              data={description}
-              onChange={(event, editor) => {
-                const data = editor.getData();
-                setDescription(data);
-              }}
-              config={{
-                toolbar: [
-                  "heading",
-                  "|",
-                  "bold",
-                  "italic",
-                  "link",
-                  "bulletedList",
-                  "numberedList",
-                  "|",
-                  "blockQuote",
-                  "insertTable",
-                  "|",
-                  "undo",
-                  "redo",
-                ],
-              }}
-            /> */}
             {error && (
               <span className="text-danger-600 text-xs py-2">
                 {error.description}
@@ -641,11 +661,6 @@ const CreateProduct = () => {
               preview
               isClearable={true}
             />
-            {error && (
-              <span className="text-danger-600 text-xs py-2">
-                {error.primary_image}
-              </span>
-            )}
           </div>
           <div className="">
             <label htmlFor=" hh" className="form-label ">
@@ -698,118 +713,83 @@ const CreateProduct = () => {
               icon="heroicons-outline:exclamation"
               className="light-mode alert-success mb-5"
             >
-              <p>
-                Untuk fungsi memilih model mobil, anda akan menerbitkan produk
-                dengan tipe mobil tertentu. Jika tidak memilih, maka produk ini
-                berlaku untuk semua tipe mobil!
-              </p>
+              <p>Silahkan mengisi variasi produk dengan benar</p>
             </Alert>
             <Card title="Variasi Produk" className="mb-5">
-              <div className="flex row gap-5 mb-5">
+              <div className="flex row gap-5 mb-3">
                 <div className="w-96">
-                  <Textinput
-                    type="text"
-                    label="Nama Variasi *"
-                    placeholder=""
-                    value={variant_name}
-                    onChange={(e) => setVariantName(e.target.value)}
+                  <label htmlFor=" hh" className="form-label ">
+                    Nama Variasi Pertama
+                  </label>
+                  <Select2
+                    className="react-select mt-2"
+                    classNamePrefix="select"
+                    placeholder="Pilih Tipe..."
+                    // options={typeVariant}
+                    options={filteredTypeVariantOne}
+                    value={variant_type_one}
+                    onChange={(selectedOption) => {
+                      setVariantTypeOne(selectedOption);
+                      setVariantOptionOne([]);
+                    }}
+                    isClearable
                   />
-                  {error && (
-                    <span className="text-danger-600 text-xs py-2">
-                      {error.varian_name}
-                    </span>
-                  )}
                 </div>
                 <div className="w-full">
                   <label htmlFor=" hh" className="form-label ">
-                    Opsi Variasi *
+                    Opsi Variasi Pertama
                   </label>
                   <Select
                     mode="tags"
                     style={{ width: "100%", height: 40 }}
-                    onChange={handleSelectChange}
+                    onChange={handleSelectFirstVariant}
                     tokenSeparators={[","]}
-                    disabled={variant_name.trim() === ""}
+                    value={variant_option_one}
+                    disabled={
+                      !variant_type_one ||
+                      (typeof variant_type_one === "string" &&
+                        variant_type_one.trim() === "")
+                    }
                     onKeyDown={handleKeyDown}
                   />
-                  {error && (
-                    <span className="text-danger-600 text-xs py-2">
-                      {error.variant_options}
-                    </span>
-                  )}
                 </div>
-                <div className="w-48">
+              </div>
+              <div className="flex row gap-5 mb-5">
+                <div className="w-96">
                   <label htmlFor=" hh" className="form-label ">
-                    Pilih Model Mobil ?
+                    Nama Variasi Kedua
                   </label>
-                  <button
-                    className="btn-sm btn-primary"
-                    type="button"
-                    onClick={handleOpenModalCars}
-                    style={{ height: 40, width: "100%", borderRadius: 10 }}
-                  >
-                    Tambah model
-                  </button>
-                  <Modal
-                    width={1500}
-                    title="Model Mobil"
-                    open={isModalOpenCars}
-                    centered
-                    footer
-                    onCancel={handleCancelModalCars}
-                    // style={{ maxWidth: "5000vh", overflow: "auto" }}
-                  >
-                    <Card>
-                      <div className="flex row w-full justify-between items-center mb-2 gap-5">
-                        <div className="w-full">
-                          <Textinput
-                            // value={query || ""}
-                            onChange={(event) =>
-                              setQuery({
-                                ...query,
-                                search: event.target.value,
-                              })
-                            }
-                            placeholder="Cari model mobil..."
-                          />
-                        </div>
-                        <div className="">
-                          <button
-                            className="action-btn flex btn-danger"
-                            type="button"
-                            onClick={onResetCheckCars}
-                            style={{ height: 40, width: 40 }}
-                          >
-                            <Icon icon="heroicons:arrow-path" />
-                          </button>
-                        </div>
-                      </div>
-                    </Card>
-                    <Card className="mt-2">
-                      <div className="flex row ">
-                        <ul>
-                          <div className="grid xl:grid-cols-10 md:grid-cols-10 grid-cols-1 gap-5 h-full ">
-                            {data_cars?.map((car) => (
-                              <li key={car?.uid} className="flex row ">
-                                <Checkbox
-                                  value={selected_cars_by_uid.includes(car?.uid)}
-                                  onChange={() => handleCheckboxChange(car?.uid)}
-                                />
-                                {`${car?.full_name}`}
-                              </li>
-                            ))}
-                          </div>
-                        </ul>
-                      </div>
-                    </Card>
-                    <div className="grid xl:grid-cols-1 md:grid-cols-1 grid-cols-1 gap-5 mt-10">
-                      <Button
-                        text="Konfirmasi"
-                        className="btn-primary dark w-full"
-                        onClick={onSubmitCars}
-                      />
-                    </div>
-                  </Modal>
+                  <Select2
+                    className="react-select mt-2"
+                    classNamePrefix="select"
+                    placeholder="Pilih Tipe..."
+                    // options={typeVariant}
+                    options={filteredTypeVariantTwo}
+                    value={variant_type_two}
+                    onChange={(selectedOption) => {
+                      setVariantTypeTwo(selectedOption);
+                      setVariantOptionTwo([]);
+                    }}
+                    isClearable
+                  />
+                </div>
+                <div className="w-full">
+                  <label htmlFor=" hh" className="form-label ">
+                    Opsi Variasi Kedua
+                  </label>
+                  <Select
+                    mode="tags"
+                    style={{ width: "100%", height: 40 }}
+                    onChange={handleSelectSecondVariant}
+                    tokenSeparators={[","]}
+                    value={variant_option_two}
+                    disabled={
+                      !variant_type_two ||
+                      (typeof variant_type_two === "string" &&
+                        variant_type_two.trim() === "")
+                    }
+                    onKeyDown={handleKeyDown}
+                  />
                 </div>
               </div>
               <div className="w-full flex justify-end">
@@ -821,83 +801,160 @@ const CreateProduct = () => {
               </div>
             </Card>
             {variant_generator_data?.length > 0 && (
-              <Card title={`Variasi`} className="mt-5">
-                {variant_generator_data?.map((item, index) => (
-                  <Card key={index} className="mt-5">
-                    <div className="flex justify-between mb-5">
-                      <div className="">
-                        <span className="text-success-500">
-                          {item?.variant?.option ? (
-                            `Opsi Variasi : ${item?.variant?.option}`
-                          ) : (
-                            <></>
-                          )}
-                          <br />
-                          {item?.car_model?.full_name ? (
-                            `Model Mobil : ${item?.car_model?.full_name}`
-                          ) : (
-                            <></>
-                          )}
-                        </span>
-                      </div>
-                      <div className="flex row justify-end gap-10">
+              <>
+                <Card title={""}>
+                  <div className="grid xl:grid-cols-3 md:grid-cols-3 grid-cols-1 gap-5 mb-5">
+                    <div>
+                      <Textinput
+                        type="text"
+                        label="Harga Beli Produk"
+                        value={commonBuyPrice}
+                        placeholder="Masukkan harga beli untuk menerapkan keseluruhan harga beli"
+                        onChange={(e) => setCommonBuyPrice(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <Textinput
+                        type="text"
+                        label="Harga Jual Produk"
+                        placeholder="Masukkan harga jual untuk menerapkan keseluruhan harga jual"
+                        value={commonSellPrice}
+                        onChange={(e) => setCommonSellPrice(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <Textinput
+                        type="text"
+                        label="Berat Produk (Gram)"
+                        placeholder="Masukkan berat produk untuk menerapkan keseluruhan berat"
+                        value={commonWeight}
+                        onChange={(e) => setCommonWeight(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <div className="grid xl:grid-cols-1 md:grid-cols-1 grid-cols-1 gap-5 mb-5">
+                    <div>
+                      <Button
+                        text="Terapkan"
+                        className="btn-primary light w-full "
+                        onClick={applyCommonPrices}
+                      />
+                    </div>
+                  </div>
+                </Card>
+                <Card title={`Variasi`} className="mt-5">
+                  {variant_generator_data?.map((variantGroup, index) => (
+                    <Card key={index} className="mt-5">
+                      <div className="flex justify-between mb-5">
                         <div className="">
-                          <Switch
-                            label="Utama"
-                            activeClass="bg-success-500"
-                            badge
-                            prevIcon="heroicons-outline:check"
-                            nextIcon="heroicons-outline:x"
-                            value={index === check_is_primary_variant}
-                            onChange={() => handlePrimaryVariantChange(index)}
+                          <span className="text-success-500">
+                            {variantGroup?.length > 0 ? (
+                              variantGroup.map((variant, variantIndex) => (
+                                <div key={variantIndex} className="mb-2">
+                                  <span className="text-success-500">
+                                    {`${variant.type}: ${variant.option}`}
+                                  </span>
+                                </div>
+                              ))
+                            ) : (
+                              <>Tidak ada varian</>
+                            )}
+                          </span>
+                        </div>
+                        <div className="flex row justify-end gap-10">
+                          <div className="">
+                            <Switch
+                              label="Utama"
+                              activeClass="bg-success-500"
+                              badge
+                              prevIcon="heroicons-outline:check"
+                              nextIcon="heroicons-outline:x"
+                              value={index === check_is_primary_variant}
+                              onChange={() => handlePrimaryVariantChange(index)}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      <div className="grid xl:grid-cols-5 md:grid-cols-5 grid-cols-1 gap-5 mb-5">
+                        <div className="">
+                          <Textinput
+                            type="text"
+                            label="SKU Variasi Produk * "
+                            placeholder=""
+                            disabled={disabledForms[index]}
+                            value={variants[index] ? variants[index].sku : ""}
+                            onChange={(e) =>
+                              handleSKUChange(e.target.value, index)
+                            }
+                          />
+                        </div>
+                        <div className="">
+                          <Textinput
+                            type="text"
+                            label="Barcode Variasi Produk "
+                            placeholder=""
+                            disabled={disabledForms[index]}
+                            value={
+                              variants[index] ? variants[index].barcode : ""
+                            }
+                            onChange={(e) =>
+                              handleBarcodeChange(e.target.value, index)
+                            }
+                          />
+                        </div>
+                        <div className="">
+                          <Textinput
+                            type="number"
+                            label="Harga Beli Produk *"
+                            placeholder=""
+                            disabled={disabledForms[index]}
+                            value={
+                              variants[index] ? variants[index].buy_price : ""
+                            }
+                            onChange={(e) =>
+                              handleBuyPriceChange(e.target.value, index)
+                            }
+                          />
+                        </div>
+                        <div className="">
+                          <Textinput
+                            type="number"
+                            label="Harga Jual Produk *"
+                            placeholder=""
+                            disabled={disabledForms[index]}
+                            value={
+                              variants[index] ? variants[index].sell_price : ""
+                            }
+                            onChange={(e) =>
+                              handleSellPriceChange(e.target.value, index)
+                            }
+                          />
+                        </div>
+                        <div className="">
+                          <Textinput
+                            type="number"
+                            label="Berat Produk (Gram)"
+                            placeholder=""
+                            disabled={disabledForms[index]}
+                            // value={weight[index] || ""}
+                            // onChange={(e) => {
+                            //   const newWeight = [...weight];
+                            //   newWeight[index] = e.target.value;
+                            //   setWeight(newWeight);
+                            // }}
+                            value={
+                              variants[index] ? variants[index].weight : ""
+                            }
+                            onChange={(e) =>
+                              handleWeightChange(e.target.value, index)
+                            }
                           />
                         </div>
                       </div>
-                    </div>
-                    <div className="grid xl:grid-cols-3 md:grid-cols-3 grid-cols-1 gap-5 mb-5">
-                      <div className="">
-                        <Textinput
-                          type="text"
-                          label="SKU Variasi Produk *"
-                          placeholder=""
-                          disabled={disabledForms[index]}
-                          value={variants[index] ? variants[index].sku : ""}
-                          onChange={(e) =>
-                            handleSkuChange(e.target.value, index)
-                          }
-                        />
-                      </div>
-                      <div className="">
-                        <Textinput
-                          type="number"
-                          label="Harga Variasi Produk *"
-                          placeholder=""
-                          disabled={disabledForms[index]}
-                          value={variants[index] ? variants[index].price : ""}
-                          onChange={(e) =>
-                            handlePriceChange(e.target.value, index)
-                          }
-                        />
-                      </div>
-                      <div className="">
-                        <label htmlFor=" hh" className="form-label ">
-                          Gambar Variasi Produk
-                        </label>
-                        <Fileinput
-                          selectedFile={
-                            variants[index] ? variants[index].image : null
-                          }
-                          onChange={(e) =>
-                            handleFileChangeVariantImages(e, index)
-                          }
-                          isClearable={true}
-                          disabled={disabledForms[index]}
-                        />
-                      </div>
-                    </div>
-                  </Card>
-                ))}
-              </Card>
+                    </Card>
+                  ))}
+                </Card>
+              </>
             )}
           </>
         ) : (
@@ -906,8 +963,8 @@ const CreateProduct = () => {
               <div className="">
                 <Textinput
                   type="text"
-                  label="SKU Produk *"
-                  placeholder="Masukkan sku produk"
+                  label="SKU Produk ( Optional )"
+                  placeholder="Masukkan sku produk jika tersedia"
                   value={sku}
                   onChange={(e) => setSku(e.target.value)}
                 />
@@ -915,10 +972,37 @@ const CreateProduct = () => {
               <div className="">
                 <Textinput
                   type="text"
-                  label="Harga Produk *"
-                  placeholder="Masukkan harga produk"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
+                  label="Barcode Produk ( Optional )"
+                  placeholder="Masukkan barcode produk jika tersedia"
+                  value={barcode}
+                  onChange={(e) => setBarcode(e.target.value)}
+                />
+              </div>
+              <div className="">
+                <Textinput
+                  type="number"
+                  label="Harga Beli Produk"
+                  placeholder="Masukkan harga beli produk"
+                  value={buy_price}
+                  onChange={(e) => setBuyPrice(e.target.value)}
+                />
+              </div>
+              <div className="">
+                <Textinput
+                  type="number"
+                  label="Harga Jual Produk *"
+                  placeholder="Masukkan harga jual produk"
+                  value={sell_price}
+                  onChange={(e) => setSellPrice(e.target.value)}
+                />
+              </div>
+              <div className="">
+                <Textinput
+                  type="number"
+                  label="Berat Produk ( Optional )"
+                  placeholder="Masukkan berat satuan produk"
+                  value={weight}
+                  onChange={(e) => setWeight(e.target.value)}
                 />
               </div>
             </div>

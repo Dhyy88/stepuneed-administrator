@@ -390,6 +390,7 @@ const DetailBundles = () => {
                     text="Tambah Produk"
                     className=" btn-primary btn-sm"
                     onClick={() => handleOpenModalCars()}
+                    // onClick={() => navigate(`/bundles/setProduct/${uid}`)}
                   />
                 </div>
               </header>

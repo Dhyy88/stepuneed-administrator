@@ -8,12 +8,13 @@ import Select from "react-select";
 import Textinput from "@/components/ui/Textinput";
 import Textarea from "@/components/ui/Textarea";
 import { useNavigate } from "react-router-dom";
-import LoadingButton from "../../../components/LoadingButton";
+import { useParams } from "react-router-dom";
 
-const CreateSite = () => {
+const UpdateSite = () => {
   const navigate = useNavigate();
+  let { uid } = useParams();
+  const [data, setData] = useState(null);
   const [error, setError] = useState("");
-  const [isLoadingButton, setIsLoadingButton] = useState(false);
 
   const [site_code, setSiteCode] = useState("");
   const [site_name, setSiteName] = useState("");
@@ -33,30 +34,64 @@ const CreateSite = () => {
   const [selectedProvince, setSelectedProvince] = useState(null);
   const [selectedCity, setSelectedCity] = useState(null);
 
+  const getDataById = () => {
+    try {
+      if (uid) {
+        axios.get(`${ApiEndpoint.SITES}/${uid}`).then((response) => {
+          setData(response?.data?.data);
+          setSiteCode(response?.data?.data?.code);
+          setSiteName(response?.data?.data?.name);
+          setAddress(response?.data?.data?.address);
+          setSelectedProvince({
+            value: response?.data?.data?.province?.uid,
+            label: response?.data?.data?.province?.name,
+          });
+          setSelectedCity({
+            value: response?.data?.data?.city?.uid,
+            label: response?.data?.data?.city?.name,
+          });
+          setType(
+            typeSite.find((type) => type.value === response?.data?.data?.type)
+          );
+        });
+      }
+    } catch (error) {
+      setError(err.response.data.errors);
+      console.error("Error fetching data:", error);
+    }
+  };
+
   const onSubmit = async () => {
-    setIsLoadingButton(true);
     const confirmResult = await Swal.fire({
       title: "Konfirmasi",
       text: "Anda yakin data yang dimasukkan sudah benar?",
       icon: "question",
       showCancelButton: true,
-      confirmButtonText: "Ya, Tambahkan",
+      confirmButtonText: "Ya, Perbaharui",
       cancelButtonText: "Batal",
     });
-    setIsLoadingButton(true);
+
     if (confirmResult.isConfirmed) {
       try {
-        await axios.post(ApiEndpoint.CREATE_SITES, {
+        const requestData = {
           code: site_code,
           name: site_name,
           address: address,
-          province: province,
-          city: city,
           type: type.value,
-        });
-        Swal.fire("Sukses", "Cabang berhasil ditambahkan", "success").then(
+        };
+
+        if (selectedProvince) {
+          requestData.province = selectedProvince.value;
+        }
+
+        if (selectedCity) {
+          requestData.city = selectedCity.value;
+        }
+
+        await axios.post(`${ApiEndpoint.SITES}/${uid}`, requestData);
+
+        Swal.fire("Berhasil", "Toko/Cabang berhasil diperbaharui", "success").then(
           () => {
-            setIsLoadingButton(false);
             resetForm();
             setSelectedProvince(null);
             setSelectedCity(null);
@@ -67,10 +102,7 @@ const CreateSite = () => {
       } catch (err) {
         setError(err.response.data.errors);
         Swal.fire("Gagal", err.response.data.message, "error");
-        setIsLoadingButton(false);
       }
-    } else {
-      setIsLoadingButton(false);
     }
   };
 
@@ -121,20 +153,23 @@ const CreateSite = () => {
   }, []);
 
   useEffect(() => {
+    getDataById();
+  }, [uid]);
+
+  useEffect(() => {
     if (selectedProvince && selectedProvince.uid) {
       fetchCities(selectedProvince.uid);
     }
   }, [selectedProvince]);
 
   const resetForm = () => {
-    setSiteCode("");
-    setSiteName("");
-    setAddress("");
-    setCities("");
-    setSelectedProvince(null);
-    setSelectedCity(null);
-    setType(null);
-  };
+    setSiteCode(data ? data.code : "");
+    setSiteName(data ? data.name : "");
+    setAddress(data ? data.address : "");
+    setSelectedProvince(data ? { value: data.province.uid, label: data.province.name } : null);
+    setSelectedCity(data ? { value: data.city.uid, label: data.city.name } : null);
+    setType(data ? typeSite.find((type) => type.value === data.type) : null);
+  };  
 
   const previousPage = () => {
     navigate(-1);
@@ -143,13 +178,13 @@ const CreateSite = () => {
   return (
     <>
       <div className="lg:col-span-12 col-span-12">
-        <Card title={"Tambah Cabang SJM"}>
+        <Card title={"Ubah Toko/Cabang"}>
           <div className="grid xl:grid-cols-2 md:grid-cols-2 grid-cols-1 gap-5 mb-5">
             <div className="">
               <Textinput
-                label="Kode Cabang *"
+                label="Kode Toko/Cabang *"
                 type="text"
-                placeholder="Masukkan kode cabang"
+                placeholder="Masukkan kode toko/cabang"
                 value={site_code}
                 onChange={(e) => setSiteCode(e.target.value)}
               />
@@ -157,8 +192,8 @@ const CreateSite = () => {
             <div className="">
               <Textinput
                 type="text"
-                label="Nama Cabang *"
-                placeholder="Masukkan nama cabang yang valid"
+                label="Nama Toko/Cabang *"
+                placeholder="Masukkan nama toko/cabang yang valid"
                 value={site_name}
                 onChange={(e) => setSiteName(e.target.value)}
                 className={error ? "border-danger-500" : ""}
@@ -173,10 +208,10 @@ const CreateSite = () => {
 
           <div className="text-base text-slate-600 dark:text-slate-300 mb-5">
             <Textarea
-              label="Alamat Cabang"
+              label="Alamat Toko/Cabang"
               id="pn4"
               rows="6"
-              placeholder="Masukkan alamat cabang dengan lengkap"
+              placeholder="Masukkan alamat toko atau cabang dengan lengkap"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
             />
@@ -225,7 +260,7 @@ const CreateSite = () => {
               </div>
               <div className="">
                 <label htmlFor=" hh" className="form-label ">
-                  Tipe Cabang *
+                  Tipe Toko/Cabang *
                 </label>
                 <Select
                   className="react-select mt-2"
@@ -251,11 +286,9 @@ const CreateSite = () => {
               onClick={resetForm}
             />
             <Button
-              text={ isLoadingButton ? (<LoadingButton />) : ("Simpan")}
+              text="Simpan"
               className="btn-primary dark w-full "
-              type="submit"
               onClick={onSubmit}
-              disabled={isLoadingButton}
             />
           </div>
           <div className="grid xl:grid-cols-1 md:grid-cols-1 grid-cols-1 gap-5 mt-5">
@@ -271,4 +304,4 @@ const CreateSite = () => {
   );
 };
 
-export default CreateSite;
+export default UpdateSite;

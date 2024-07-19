@@ -191,7 +191,7 @@ const UpdateSupplier = () => {
   return (
     <>
       <div className="lg:col-span-12 col-span-12">
-        <Card title={"Ubah Supplier SJM"}>
+        <Card title={"Ubah Supplier"}>
           <div className="grid xl:grid-cols-2 md:grid-cols-2 grid-cols-1 gap-5 mb-5">
             <div className="">
               <Textinput

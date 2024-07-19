@@ -2,17 +2,16 @@ import React, { useState, useEffect } from "react";
 import Textinput from "@/components/ui/Textinput";
 import Card from "@/components/ui/Card";
 import Icon from "@/components/ui/Icon";
-import Modal from "@/components/ui/Modal";
 import Tooltip from "@/components/ui/Tooltip";
 import Swal from "sweetalert2";
 import Button from "@/components/ui/Button";
-import axios from "../../../../API/Axios";
-import ApiEndpoint from "../../../../API/Api_EndPoint";
-import Loading from "../../../../components/Loading";
-import LoadingButton from "../../../../components/LoadingButton";
+import axios from "../../../API/Axios";
+import ApiEndpoint from "../../../API/Api_EndPoint";
+import Loading from "../../../components/Loading";
+import Select from "react-select";
 import { useNavigate } from "react-router-dom";
 
-const CarBrands = () => {
+const StockManual = () => {
   const navigate = useNavigate();
   const [data, setData] = useState({
     data: [],
@@ -21,23 +20,27 @@ const CarBrands = () => {
     prev_page_url: null,
     next_page_url: null,
   });
-
-  const [brand, setBrand] = useState("");
-  const [uid, setUid] = useState("");
+  const [site, setSite] = useState(null);
+  const [selectedSite, setSelectedSite] = useState(null);
 
   const [isLoading, setIsLoading] = useState(true);
-  const [isLoadingButton, setIsLoadingButton] = useState(false);
   const [error, setError] = useState(null);
-  const [query, setQuery] = useState({ search: "", paginate: 7 });
-  const [editMode, setEditMode] = useState(false);
+  const [query, setQuery] = useState({
+    search: "",
+    paginate: 7,
+    site: "",
+    date: "",
+    request_by: "",
+  });
 
-  async function getDataCars(query) {
+  async function getDataStock(query) {
     setIsLoading(true);
     try {
-      const response = await axios.post(ApiEndpoint.BRANDS_CARS, {
+      const response = await axios.post(ApiEndpoint.MANUAL_STOCK, {
         page: query?.page,
         paginate: query?.paginate,
         search: query?.search,
+        site: query?.site,
       });
       setData(response?.data?.data);
       setIsLoading(false);
@@ -47,131 +50,18 @@ const CarBrands = () => {
     }
   }
 
-  const onSubmit = async () => {
-    setIsLoadingButton(true);
-    const confirmResult = await Swal.fire({
-      title: "Konfirmasi",
-      text: "Anda yakin data yang dimasukkan sudah benar?",
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Ya, Tambahkan",
-      cancelButtonText: "Batal",
-    });
-    setIsLoadingButton(true);
-    if (confirmResult.isConfirmed) {
-      try {
-        await axios.post(`${ApiEndpoint.BRANDS_CARS}/create`, {
-          brand: brand,
-        });
-        Swal.fire("Berhasil", "Brand mobil telah ditambahkan", "success");
-        getDataCars(query);
-        resetForm();
-        setIsLoadingButton(false);
-      } catch (err) {
-        setError(err.response.data.errors);
-        Swal.fire("Gagal", err.response.data.message, "error");
-        setIsLoadingButton(false);
-      }
-    } else {
-      setIsLoadingButton(false);
-    }
-  };
-
-  async function onDelete(uid) {
+  const getSite = async () => {
     try {
-      const result = await Swal.fire({
-        icon: "question",
-        title: "Apakah Anda yakin ingin menghapus brand mobil ini?",
-        text: "Anda tidak akan dapat mengembalikannya!",
-        showCancelButton: true,
-        confirmButtonText: "Ya, Hapus",
-        cancelButtonText: "Batal",
-      });
+      const whstore_response = await axios.get(ApiEndpoint.STORE_WH_LIST);
+      const wh_response = await axios.get(ApiEndpoint.WAREHOUSE_LIST);
+      const site_response = [
+        ...whstore_response?.data?.data,
+        ...wh_response?.data?.data,
+      ];
 
-      if (result.isConfirmed) {
-        const { value: input } = await Swal.fire({
-          icon: "warning",
-          title: "Verifikasi",
-          text: `Silahkan ketik "hapus" untuk melanjutkan verifikasi hapus data !`,
-          input: "text",
-          showCancelButton: true,
-          confirmButtonText: "Konfirmasi",
-          cancelButtonText: "Batal",
-          inputValidator: (value) => {
-            if (!value || value.trim().toLowerCase() !== "hapus") {
-              return 'Anda harus memasukkan kata "hapus" untuk melanjutkan verifikasi hapus data!';
-            }
-          },
-        });
-
-        if (input && input.trim().toLowerCase() === "hapus") {
-          await axios.delete(`${ApiEndpoint.BRANDS_CARS}/${uid}`);
-          Swal.fire(
-            "Berhasil!",
-            "Anda berhasil menghapus data brand mobil ini.",
-            "success"
-          );
-          getDataCars(query);
-        } else {
-          Swal.fire("Batal", "Hapus data brand mobil dibatalkan.", "info");
-        }
-      }
-    } catch (err) {
-      Swal.fire("Gagal", err.response.data.message, "error");
-    }
-  }
-
-  const onEdit = async (uid) => {
-    try {
-      const response = await axios.get(`${ApiEndpoint.BRANDS_CARS}/${uid}`);
-      const edited_brand = response.data.data;
-
-      setBrand(edited_brand.brand);
-
-      setData({ ...data, uid: edited_brand.uid });
-      setError("");
-      setEditMode(true);
-    } catch (err) {
-      Swal.fire("Gagal", err.response.data.message, "error");
-    }
-  };
-
-  const onUpdate = async (e) => {
-    setIsLoadingButton(true);
-    e.preventDefault();
-
-    const result = await Swal.fire({
-      title: "Konfirmasi",
-      text: "Apakah Anda yakin data yang diubah sudah benar?",
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Ya, Ubah",
-      cancelButtonText: "Batal",
-    });
-    setIsLoadingButton(true);
-    if (result.isConfirmed) {
-      const formData = new FormData();
-      formData.append("brand", brand);
-
-      try {
-        await axios.post(`${ApiEndpoint.BRANDS_CARS}/${data.uid}`, formData);
-
-        setBrand("");
-
-        Swal.fire({
-          icon: "success",
-          text: "Berhasil, data brand telah diperbaharui!",
-        });
-        getDataCars(query);
-        resetForm();
-        setEditMode(false);
-        setIsLoadingButton(false);
-      } catch (error) {
-        Swal.fire("Gagal", error.response.data.message, "error");
-        setIsLoadingButton(false);
-      }
-    } else {
-      setIsLoadingButton(false);
+      setSite(site_response);
+    } catch (error) {
+      Swal.fire("Gagal", error.response.data.message, "error");
     }
   };
 
@@ -212,28 +102,57 @@ const CarBrands = () => {
   };
 
   useEffect(() => {
-    getDataCars(query);
+    getDataStock(query);
   }, [query]);
 
-  const resetForm = () => {
-    setBrand("");
-    setEditMode(false);
-  };
+  useEffect(() => {
+    getSite();
+  }, []);
 
   return (
     <>
       <div className="grid grid-cols-12 gap-6">
-        <div className="lg:col-span-8 col-span-12">
-          <Card title="Data Brand Mobil">
+        <div className="lg:col-span-12 col-span-12">
+          <Card title="Stok Produk Manual">
             <div className="md:flex justify-between items-center mb-4">
               <div className="md:flex items-center gap-3">
+                <div className="row-span-3 md:row-span-4">
+                  <Button
+                    text="Tambah Stok"
+                    className="btn-primary dark w-full btn-sm "
+                    onClick={() => navigate(`/manualstock/create`)}
+                  />
+                </div>
+              </div>
+              <div className="md:flex items-center gap-3">
+                <div className="row-span-3 md:row-span-4 w-48">
+                  <Select
+                    className="react-select py-2 w-full"
+                    classNamePrefix="select"
+                    placeholder="Pilih cabang..."
+                    options={[
+                      { value: "", label: "Semua Cabang" },
+                      ...(site?.map((item) => ({
+                        value: item.uid,
+                        label: item.name,
+                      })) || []),
+                    ]}
+                    onChange={(value) => {
+                      setQuery({ ...query, site: value?.value });
+                      setSelectedSite(value);
+                    }}
+                    value={selectedSite}
+                    showSearch
+                    isClearable
+                  />
+                </div>
                 <div className="row-span-3 md:row-span-4">
                   <Textinput
                     // value={query || ""}
                     onChange={(event) =>
                       setQuery({ ...query, search: event.target.value })
                     }
-                    placeholder="Cari brand mobil..."
+                    placeholder="Cari..."
                   />
                 </div>
               </div>
@@ -247,7 +166,13 @@ const CarBrands = () => {
                         <thead className="bg-slate-200 dark:bg-slate-700">
                           <tr>
                             <th scope="col" className=" table-th ">
-                              Nama Brand
+                              Catatan
+                            </th>
+                            <th scope="col" className=" table-th ">
+                              Total Produk
+                            </th>
+                            <th scope="col" className=" table-th ">
+                              Toko/Cabang
                             </th>
                             <th scope="col" className=" table-th ">
                               Aksi
@@ -266,7 +191,13 @@ const CarBrands = () => {
                         <thead className="bg-slate-200 dark:bg-slate-700">
                           <tr>
                             <th scope="col" className=" table-th ">
-                              Nama Brand
+                              Catatan
+                            </th>
+                            <th scope="col" className=" table-th ">
+                              Total Produk
+                            </th>
+                            <th scope="col" className=" table-th ">
+                              Toko/Cabang
                             </th>
                             <th scope="col" className=" table-th ">
                               Aksi
@@ -283,7 +214,7 @@ const CarBrands = () => {
                         </div>
                         <div className="w-full flex justify-center text-secondary">
                           <span className="text-slate-900 dark:text-white text-[20px] transition-all duration-300">
-                            Brand Mobil belum tersedia
+                            Data belum tersedia
                           </span>
                         </div>
                       </div>
@@ -293,7 +224,13 @@ const CarBrands = () => {
                       <thead className="bg-slate-200 dark:bg-slate-700">
                         <tr>
                           <th scope="col" className=" table-th ">
-                            Nama Brand
+                            Catatan
+                          </th>
+                          <th scope="col" className=" table-th ">
+                            Total Produk
+                          </th>
+                          <th scope="col" className=" table-th ">
+                            Toko/Cabang
                           </th>
                           <th scope="col" className=" table-th ">
                             Aksi
@@ -303,12 +240,20 @@ const CarBrands = () => {
                       <tbody className="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
                         {data?.data?.map((item, index) => (
                           <tr key={index}>
-                            <td className="table-td">{item?.brand} </td>
+                            <td className="table-td">
+                              {item?.note ? item?.note : "-"}{" "}
+                            </td>
+                            <td className="table-td">
+                              {item?.manual_stock_products_count
+                                ? item?.manual_stock_products_count
+                                : "-"}{" "}
+                            </td>
+                            <td className="table-td">{item?.site?.name} </td>
 
                             <td className="table-td">
                               <div className="flex space-x-3 rtl:space-x-reverse">
                                 <Tooltip
-                                  content="Edit"
+                                  content="Detail"
                                   placement="top"
                                   arrow
                                   animation="shift-away"
@@ -316,27 +261,13 @@ const CarBrands = () => {
                                   <button
                                     className="action-btn"
                                     type="button"
-                                    // onClick={() =>
-                                    //   navigate(`/cars/update/${item.uid}`)
-                                    // }
-                                    onClick={() => onEdit(item.uid)}
+                                    onClick={() =>
+                                      navigate(
+                                        `/manualstock/detail/${item.uid}`
+                                      )
+                                    }
                                   >
-                                    <Icon icon="heroicons:pencil-square" />
-                                  </button>
-                                </Tooltip>
-                                <Tooltip
-                                  content="Hapus"
-                                  placement="top"
-                                  arrow
-                                  animation="shift-away"
-                                  theme="danger"
-                                >
-                                  <button
-                                    className="action-btn"
-                                    type="button"
-                                    onClick={() => onDelete(item.uid)}
-                                  >
-                                    <Icon icon="heroicons:trash" />
+                                    <Icon icon="heroicons:eye" />
                                   </button>
                                 </Tooltip>
                               </div>
@@ -404,59 +335,9 @@ const CarBrands = () => {
             {/*end*/}
           </Card>
         </div>
-        <div className="lg:col-span-4 col-span-12">
-          <Card title={editMode ? "Ubah Brand Mobil" : "Tambah Brand Mobil"}>
-            <div className="text-sm text-slate-600 font-normal bg-white dark:bg-slate-900 dark:text-slate-300 rounded p-5">
-              <div className="text-base text-slate-600 dark:text-slate-300 mb-4">
-                <Textinput
-                  label="Nama Brand *"
-                  type="text"
-                  placeholder="Masukkan nama brand mobil yang valid"
-                  onChange={(e) => setBrand(e.target.value)}
-                  value={brand}
-                />
-                {error && (
-                  <span className="text-danger-600 text-xs py-2">
-                    {error.brand}
-                  </span>
-                )}
-              </div>
-              <div className="text-base text-end text-slate-600 dark:text-slate-300">
-                {editMode ? (
-                  <Button
-                    text={isLoadingButton ? <LoadingButton /> : "Ubah"}
-                    className="btn-primary dark  mr-2 mb-4 "
-                    onClick={onUpdate}
-                    disabled={isLoadingButton}
-                  />
-                ) : (
-                  <Button
-                    text={isLoadingButton ? <LoadingButton /> : "Simpan"}
-                    className="btn-primary dark  mr-2 mb-4 "
-                    onClick={onSubmit}
-                    disabled={isLoadingButton}
-                  />
-                )}
-                {editMode ? (
-                  <Button
-                    text="Batal"
-                    className="btn-primary light "
-                    onClick={resetForm}
-                  />
-                ) : (
-                  <Button
-                    text="Reset"
-                    className="btn-primary light "
-                    onClick={resetForm}
-                  />
-                )}
-              </div>
-            </div>
-          </Card>
-        </div>
       </div>
     </>
   );
 };
 
-export default CarBrands;
+export default StockManual;

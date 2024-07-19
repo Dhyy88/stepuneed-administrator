@@ -12,95 +12,46 @@ import Textarea from "@/components/ui/Textarea";
 import { useNavigate } from "react-router-dom";
 import Alert from "@/components/ui/Alert";
 import LoadingButton from "../../../components/LoadingButton";
-import { useParams } from "react-router-dom";
-import { index } from "d3-array";
 
-const SetProduct = () => {
+const CreateStockManual = () => {
   const navigate = useNavigate();
-  let { uid } = useParams();
 
   const [dataProduct, setDataProduct] = useState([]);
-  const [data, setData] = useState([]);
-  const [selectedVariantDetails, setSelectedVariantDetails] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-
+  const [note, setNote] = useState("");
+  const [site, setSite] = useState(null);
+  const [selectedSite, setSelectedSite] = useState(null);
   const [variants, setVariants] = useState([""]);
-  const [alias, setAlias] = useState([""]);
-  const [price, setPrice] = useState([""]);
+  const [prices, setPrices] = useState([""]);
+  const [quantities, setQuantities] = useState([""]);
+  const [selectedVariantDetails, setSelectedVariantDetails] = useState([]);
 
   const previousPage = () => {
     navigate(-1);
   };
 
-  const getDataById = () => {
-    try {
-      if (uid) {
-        axios.get(`${ApiEndpoint.SUPPLIER}/${uid}`).then((response) => {
-          const bundleData = response.data.data;
-          setData(bundleData);
-
-          if (bundleData.variants && bundleData.variants.length > 0) {
-            const variantsData = bundleData.variants.map((item) => ({
-              variant: item.uid,
-              alias: item.detail?.product_name_alias,
-              price: item.detail.price,
-              label: `${item.product.name} - ${item.sku}`,
-              // extra: `Rp ${item.detail.price.toLocaleString("id-ID")}`,
-              extra:
-              item?.detail?.buy_price !== null
-                ? `${item?.detail?.buy_price}`
-                : "",
-              value: item.uid,
-            }));
-
-            const variants = variantsData.map((item) => item.variant);
-            const alias = variantsData.map((item) => item.alias);
-            const price = variantsData.map((item) => item.price);
-            setSelectedVariantDetails(variantsData);
-
-            setVariants(variants);
-            setAlias(alias);
-            setPrice(price);
-          } else {
-            setVariants([]);
-            setAlias([]);
-            setPrice([]);
-            setSelectedVariantDetails([]);
-          }
-        });
-      }
-    } catch (error) {
-      setError(error.response.data.errors);
-      console.error("Error fetching data:", error);
-    }
-  };
-
-  useEffect(() => {
-    getDataById();
-  }, []);
-
   const handleAddProduct = () => {
     setVariants([...variants, ""]);
-    setAlias([...alias, ""]);
-    setPrice([...price, ""]);
+    setPrices([...prices, ""]);
+    setQuantities([...quantities, ""]);
     setSelectedVariantDetails([...selectedVariantDetails, null]);
   };
 
   const handleRemoveProduct = (index) => {
     const updatedVariants = [...variants];
-    const updatedAlias = [...alias];
-    const updatedPrices = [...price];
+    const updatedPrices = [...prices];
+    const updatedQuantities = [...quantities];
     const updatedSelectedVariantDetails = [...selectedVariantDetails];
 
     updatedVariants.splice(index, 1);
-    updatedAlias.splice(index, 1);
     updatedPrices.splice(index, 1);
+    updatedQuantities.splice(index, 1);
     updatedSelectedVariantDetails.splice(index, 1);
 
     setVariants(updatedVariants);
-    setAlias(updatedAlias);
-    setPrice(updatedPrices);
+    setPrices(updatedPrices);
+    setQuantities(updatedQuantities);
     setSelectedVariantDetails(updatedSelectedVariantDetails);
   };
 
@@ -116,28 +67,42 @@ const SetProduct = () => {
       (variant) => variant.value === value.value
     );
     if (selectedVariant) {
-      const updatedAlias = [...alias];
-      updatedAlias[index] = selectedVariant.alias;
-      setAlias(updatedAlias);
+      const updatePrice = [...prices];
+      updatePrice[index] = selectedVariant.extra; 
+      setPrices(updatePrice);
     }
-    if (selectedVariant) {
-      const updatePrice = [...price];
-      updatePrice[index] = selectedVariant.extra;
-      setPrice(updatePrice);
-    }
-  };
-
-  const handleAliasChange = (value, index) => {
-    const updatedAlias = [...alias];
-    updatedAlias[index] = value;
-    setAlias(updatedAlias);
   };
 
   const handlePriceChange = (value, index) => {
-    const updatedPrices = [...price];
+    const updatedPrices = [...prices];
     updatedPrices[index] = value;
-    setPrice(updatedPrices);
+    setPrices(updatedPrices);
   };
+
+  const handleQuantityChange = (value, index) => {
+    const updatedQuantities = [...quantities];
+    updatedQuantities[index] = value;
+    setQuantities(updatedQuantities);
+  };
+
+  const getSite = async () => {
+    try {
+      const warehouse_response = await axios.get(ApiEndpoint.WAREHOUSE_LIST);
+      const whstore_response = await axios.get(ApiEndpoint.STORE_WH_LIST);
+      const site_response = [
+        ...warehouse_response?.data?.data,
+        ...whstore_response?.data?.data,
+      ];
+
+      setSite(site_response);
+    } catch (error) {
+      Swal.fire("Gagal", error.response.data.message, "error");
+    }
+  };
+
+  useEffect(() => {
+    getSite();
+  }, []);
 
   const fetchVariants = async () => {
     try {
@@ -151,10 +116,7 @@ const SetProduct = () => {
                   value: dataProduct.uid,
                   label: `${dataProduct.full_name}`,
                   alias: `${dataProduct.full_name}`,
-                  extra:
-                    dataProduct.buy_price !== null
-                      ? `${dataProduct.buy_price}`
-                      : "",
+                  extra: `${dataProduct.sell_price}`,
                   // extra: `Rp ${dataProduct.buy_price.toLocaleString("id-ID")}`,
                 }
               : null;
@@ -171,7 +133,7 @@ const SetProduct = () => {
                 value: variant.uid,
                 label: `${dataProduct.product.name} `,
                 alias: `${dataProduct.full_name}`,
-                extra: `Rp. ${variant.price.toLocaleString("id-ID")}`,
+                extra: `Rp. ${variant.sell_price.toLocaleString("id-ID")}`,
               }));
             } else {
               const primaryVariant = dataProduct.primary_variant;
@@ -238,58 +200,44 @@ const SetProduct = () => {
         </div>
         <div className="">
           <Textinput
-            label="Nama Alias Produk *"
-            type="text"
-            placeholder="Tentukan alias produk"
-            value={alias[index]}
-            onChange={(e) => handleAliasChange(e.target.value, index)}
+            label="Harga Produk *"
+            type="number"
+            placeholder="Tentukan nilai harga produk"
+            value={prices[index]}
+            onChange={(e) => handlePriceChange(e.target.value, index)}
           />
         </div>
         <div className="flex justify-between items-end space-x-5">
           <div className="flex-1">
             <Textinput
-              label="Harga Supplier (Optional)"
+              label="Jumlah Produk *"
               type="number"
-              placeholder="Tentukan nilai harga supplier"
-              value={price[index]}
-              onChange={(e) => handlePriceChange(e.target.value, index)}
+              placeholder="Tentukan jumlah yang diinginkan"
+              value={quantities[index]}
+              onChange={(e) => handleQuantityChange(e.target.value, index)}
             />
           </div>
           <div className="flex-none relative">
-            {/* <div className="flex justify-end mb-2">
-              <Button
-                text="Tambah Produk"
-                className="btn-primary light"
-                onClick={handleAddProduct}
-              />
-            </div> */}
-
             <button
-              className="inline-flex items-center justify-center h-10 w-10 bg-danger-500 text-lg border rounded border-danger-500 text-white mr-2"
+              className="inline-flex items-center justify-center h-10 w-10 bg-danger-500 text-lg border rounded border-danger-500 text-white"
               onClick={() => handleRemoveProduct(index)}
             >
               <Icon icon="heroicons:trash" />
             </button>
-            <button
-              className="inline-flex items-center justify-center h-10 w-10 bg-primary-500 text-lg border rounded border-primary-500 text-white"
-              onClick={() => handleAddProduct(index)}
-            >
-              <Icon icon="heroicons:plus" />
-            </button>
           </div>
         </div>
       </div>
-      {/* {selectedVariantDetails[index] && (
+      {selectedVariantDetails[index] && (
         <Alert
           icon="heroicons-outline:arrow-right"
           className="light-mode alert-success mb-5"
         >
           <div>
-            <p>Nama Produk : {selectedVariantDetails[index].label}</p>
-            <p>Harga Beli : {selectedVariantDetails[index].extra}</p>
+            <p>Produk: {selectedVariantDetails[index].label}</p>
+            <p>Harga Jual Produk: {selectedVariantDetails[index].extra}</p>
           </div>
         </Alert>
-      )} */}
+      )}
     </div>
   );
 
@@ -297,7 +245,7 @@ const SetProduct = () => {
     setIsLoading(true);
     const confirmation = await Swal.fire({
       title: "Konfirmasi",
-      text: "Apakah Anda yakin ingin pengaturan produk anda sudah benar?",
+      text: "Apakah Anda yakin ingin data permintaan stok sudah benar?",
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Ya",
@@ -309,21 +257,19 @@ const SetProduct = () => {
     if (confirmation.isConfirmed) {
       try {
         const formData = {
-          variants: variants.map((variant, index) => ({
-            uid: variant,
-            alias: alias[index],
-            price: price[index] || 0,
-          }))
-          .filter((variant) => variant.uid && variant.alias && variant.price),
+          site : selectedSite?.value,
+          note,
+          variants: variants.map((uid, index) => ({
+            uid,
+            price: prices[index],
+            quantity: quantities[index],
+          })),
         };
 
-        await axios.post(
-          `${ApiEndpoint.SUPPLIER}/${uid}/set-products`,
-          formData
-        );
-        Swal.fire("Berhasil!", "Produk berhasil diatur.", "success");
+        await axios.post(ApiEndpoint.CREATE_MANUAL_STOCK, formData);
+        Swal.fire("Berhasil!", "Permintaan stok berhasil dibuat.", "success");
         setIsLoading(false);
-        previousPage();
+        navigate("/manualstocks");
       } catch (error) {
         if (
           error.response &&
@@ -333,7 +279,7 @@ const SetProduct = () => {
           Swal.fire("Error!", error.response.data.message, "error");
           setError(error.response.data.errors);
         } else {
-          setError("Terjadi kesalahan saat membuat Bundle.");
+          setError("Terjadi kesalahan saat membuat permintaan.");
         }
         setIsLoading(false);
       }
@@ -344,7 +290,40 @@ const SetProduct = () => {
 
   return (
     <div className="lg:col-span-12 col-span-12">
-      <Card title={"Atur produk supplier"}>
+      <Card title={"Tambah Permintaan Stok"}>
+        <Card className="mb-4">
+          <div className="text-base text-slate-600 dark:text-slate-300 mb-4">
+            <label htmlFor=" hh" className="form-label ">
+              Pilih Toko/Cabang *
+            </label>
+            <Select
+              className="react-select mt-2"
+              classNamePrefix="select"
+              placeholder="Pilih toko/cabang..."
+              options={site?.map((item) => ({
+                value: item.uid,
+                label: item.name,
+              }))}
+              onChange={(selectedOption) => setSelectedSite(selectedOption)}
+              value={selectedSite}
+              isClearable
+            />
+            {error && (
+              <span className="text-danger-600 text-xs py-2">{error.site}</span>
+            )}
+          </div>
+          <div className="text-base text-slate-600 dark:text-slate-300 mb-5">
+            <Textarea
+              label="Catatan (Optional)"
+              id="pn4"
+              rows="6"
+              placeholder="Masukkan catatan jika diperlukan"
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+            />
+          </div>
+        </Card>
+
         <Card className="mb-4">
           <div className="flex justify-end mb-2">
             <Button
@@ -375,4 +354,4 @@ const SetProduct = () => {
   );
 };
 
-export default SetProduct;
+export default CreateStockManual;

@@ -32,10 +32,9 @@ const CustomerArmy = lazy(() => import("./pages/MasterSales/SalesArmy/Customer")
 const SalesInternal = lazy(() => import("./pages/MasterSales/SalesInternal"));
 
 // Master Divisi
-const Dealers = lazy(() => import("./pages/MasterDivisi/MasterDealer"));
-const Sites = lazy(() => import("./pages/MasterDivisi/MasterSite"));
-const CreateSite = lazy(() => import("./pages/MasterDivisi/MasterSite/create"));
-const UpdateSite = lazy(() => import("./pages/MasterDivisi/MasterSite/update"));
+const Sites = lazy(() => import("./pages/MasterData/MasterSite"));
+const CreateSite = lazy(() => import("./pages/MasterData/MasterSite/create"));
+const UpdateSite = lazy(() => import("./pages/MasterData/MasterSite/update"));
 const Warehouses = lazy(() => import("./pages/MasterUser/MasterWarehouse"));
 const SPVWarehouses = lazy(() => import("./pages/MasterUser/MasterWarehouseSPV"));
 
@@ -45,25 +44,27 @@ const DetailUser = lazy(() => import("./pages/MasterUser/MasterAccountUser/detai
 const Permissions = lazy(() => import("./pages/MasterUser/MasterPermission"));
 const CreatePermission = lazy(() => import('./pages/MasterUser/MasterPermission/create'));
 const UpdatePermission = lazy(() => import('./pages/MasterUser/MasterPermission/update'));
+const Cashiers = lazy(() => import("./pages/MasterUser/MasterCashier"));
 
 // Master Data
 const Products = lazy(() => import("./pages/MasterData/Product"));
+const VariantProducts = lazy(() => import("./pages/MasterData/Product/index_variant"));
 const CreateProduct = lazy(() => import("./pages/MasterData/Product/create"));
 const DetailProducts = lazy(() => import("./pages/MasterData/Product/detail"));
 const UpdateProduct = lazy(() => import("./pages/MasterData/Product/update"));
-const Bundles = lazy(() => import("./pages/MasterData/Bundles"));
-const CreateBundle = lazy(() => import("./pages/MasterData/Bundles/create"));
-const UpdateBundle = lazy(() => import("./pages/MasterData/Bundles/update"));
-const DetailBundles = lazy(() => import("./pages/MasterData/Bundles/detail"));
+// const Bundles = lazy(() => import("./pages/MasterData/Bundles"));
+// const CreateBundle = lazy(() => import("./pages/MasterData/Bundles/create"));
+// const UpdateBundle = lazy(() => import("./pages/MasterData/Bundles/update"));
+// const DetailBundles = lazy(() => import("./pages/MasterData/Bundles/detail"));
 const Categories = lazy(() => import("./pages/MasterData/Category"));
-const Cars = lazy(() => import("./pages/MasterData/Cars"));
-const CarBrands = lazy(() => import("./pages/MasterData/Cars/Brands"));
-const UpdateCars = lazy(() => import("./pages/MasterData/Cars/update"));
+const BrandsProduct = lazy(() => import("./pages/MasterData/Brands"));
+
 const Suppliers = lazy(() => import("./pages/MasterData/Supplier"));
 const DetailSupplier = lazy(() => import("./pages/MasterData/Supplier/detail"));
 const CreateSupplier = lazy(() => import("./pages/MasterData/Supplier/create"));
 const UpdateSupplier = lazy(() => import("./pages/MasterData/Supplier/update"));
 const SetProduct = lazy(() => import("./pages/MasterData/Supplier/set_product"));
+// const SetProductBundle = lazy(() => import("./pages/MasterData/Bundles/set_product_bundle"));
 
 // Master Purchase Order
 const PurchaseOrder = lazy(() => import("./pages/MasterPO"));
@@ -73,10 +74,19 @@ const DetailPurchaseOrder = lazy(() => import("./pages/MasterPO/detail"));
 const UpdatePurchaseOrder = lazy(() => import("./pages/MasterPO/update"));
 const ApprovePuchaseOrder = lazy(() => import("./pages/MasterPO/index_approve"));
 
+// Master Stock Manual
+const StockManual = lazy(() => import("./pages/MasterStock/MasterStockManual"));
+const DetailManualStock = lazy(() => import("./pages/MasterStock/MasterStockManual/detail"));
+const CreateStockManual = lazy(() => import("./pages/MasterStock/MasterStockManual/create"));
+const UpdateManualStock = lazy(() => import("./pages/MasterStock/MasterStockManual/update"));
+const StocksSite = lazy(() => import("./pages/MasterStock/StockSite"));
+
 // Master Report
 const PurchaseOrderReport = lazy(() => import("./pages/MasterReport/index_PO"));
 const StockOpnameReport = lazy(() => import("./pages/MasterReport/index_SO"));
 const DetailStockOpnameReport = lazy(() => import("./pages/MasterReport/detail"));
+
+const Contoh = lazy(() => import("./pages/MasterData/Product/contoh"))
 
 function App() {
   const ability = createMongoAbility();
@@ -87,6 +97,7 @@ function App() {
             <Route path="/" element={ <Suspense fallback={<Loading />}> <Login /> </Suspense>} />
             <Route path="/*" element={<Layout />}>
               <Route path="dashboard" element={<Dashboard />} />
+              <Route path="contoh" element={<Contoh />} />
 
               {/* Route Sales Army */}
               <Route path="army" element={<SalesArmy />} />
@@ -104,7 +115,6 @@ function App() {
               <Route path="salesInternal" element={<SalesInternal />} />
 
               {/* Route Divisi */}
-              <Route path="dealers" element={<Dealers />} />
               <Route path="sites" element={<Sites />} />
               <Route path="site/create" element={ <Suspense fallback={<Loading />}> <CreateSiteProtect /> </Suspense> } />
               <Route path="site/update/:uid" element={ <Suspense fallback={<Loading />}> <UpdateSiteProtect /> </Suspense> } />
@@ -113,18 +123,18 @@ function App() {
               
               {/* Route Master Data */}
               <Route path="products" element={<Products />} />
+              <Route path="productvariants" element={<VariantProducts />} />
               <Route path="product/create" element={<CreateProduct />} />
               <Route path="product/detail/:uid" element={<DetailProducts />} />
               <Route path="product/update/:uid" element={<UpdateProduct />} />
               
-              <Route path="bundles" element={<Bundles />} />
+              {/* <Route path="bundles" element={<Bundles />} />
               <Route path="bundles/create" element={<CreateBundle />} />
               <Route path="bundles/detail/:uid" element={<DetailBundles />} />
               <Route path="bundles/update/:uid" element={<UpdateBundle />} />
+              <Route path="bundles/setProduct/:uid" element={<SetProductBundle />} /> */}
               <Route path="categories" element={<Categories />} />
-              <Route path="cars" element={<Cars />} />
-              <Route path="brands" element={<CarBrands />} />
-              <Route path="cars/update/:uid" element={<UpdateCars />} />
+              <Route path="brands" element={<BrandsProduct />} />
 
                {/* Route Master Supplier */}
               <Route path="suppliers" element={<Suppliers />} />
@@ -142,6 +152,12 @@ function App() {
               <Route path="po/detail/:uid" element={<DetailPurchaseOrder />} />
               <Route path="po/update/:uid" element={<UpdatePurchaseOrder />} />
 
+              <Route path="manualstocks" element={<StockManual />} /> 
+              <Route path="manualstock/create" element={<CreateStockManual />} /> 
+              <Route path="manualstock/detail/:uid" element={<DetailManualStock />} />
+              <Route path="manualstock/update/:uid" element={<UpdateManualStock />} />
+              <Route path="stocks" element={<StocksSite />} /> 
+
               {/* Route Report */}
               <Route path="poreport" element={ <PurchaseOrderReport />} />
               <Route path="soreport" element={ <StockOpnameReport />} />
@@ -154,6 +170,7 @@ function App() {
               <Route path="users" element={ <Suspense fallback={<Loading />}> <UserProtect /> </Suspense> } />
               
               <Route path="users/detail/:uid" element={<DetailUser />} />
+              <Route path="cashiers" element={<Cashiers />} />
 
               {/* Route Permission */}
               <Route path="permissions" element={<Permissions />} />

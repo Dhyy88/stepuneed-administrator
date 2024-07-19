@@ -45,17 +45,26 @@ const ApiEndpoint = {
     PO : 'ho/purchase-orders',
     PO_BY_ME : "ho/purchase-orders/create-by-me",
     PO_APPROVE : "ho/purchase-orders/approve-by-me",
+    HO_APPROVE_PO : "ho/hos/can-approve-po",
 
     //CATEGORY
     CATEGORY: 'ho/categories',
     CREATE_CATEGORY: 'ho/categories/create',
     CATEGORIES: 'categories/tree',
 
+    //BRANDS
+    BRANDS: 'ho/brands',
+
     //PRODCTS
     PRODUCTS : 'ho/products',
     VARIANT_GENERATOR: 'ho/products/variant-generator',
     CREATE_PRODUCTS: 'ho/products/create',
     ALL_VARIANT: 'ho/products/variants',
+
+    //MANUAL STOCK
+    MANUAL_STOCK : 'ho/manual-stocks',
+    CREATE_MANUAL_STOCK: 'ho/manual-stocks/create',
+    STOCK: '/ho/products/stocks',
 
     //SUPPLIER
     SUPPLIER : 'ho/suppliers',

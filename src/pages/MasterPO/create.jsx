@@ -30,7 +30,7 @@ const CreatePurchaseOrder = () => {
   const [document_date, setDocumentDate] = useState("");
   const [delivery_date, setDeliveryDate] = useState("");
   const [site, setSite] = useState([]);
-  const [cost, setCost] = useState("");
+  const [cost, setCost] = useState("0");
   const [note, setNote] = useState("");
   const [is_draft, setIsDraft] = useState(false);
 
@@ -64,7 +64,7 @@ const CreatePurchaseOrder = () => {
   };
 
   const getUser = () => {
-    const response = axios.post(ApiEndpoint.HO).then((response) => {
+    const response = axios.get(ApiEndpoint.HO_APPROVE_PO).then((response) => {
       setDataUser(response?.data?.data);
     })
   }
@@ -139,6 +139,13 @@ const CreatePurchaseOrder = () => {
     getUser()
   }, []);
 
+  const getFilteredOptions = (index) => {
+    const selectedVariantIds = variants.filter((variant, i) => i !== index);
+    return dataProduct.filter(
+      (variant) => !selectedVariantIds.includes(variant.value)
+    );
+  };
+
   const renderVariantInputs = (index) => (
     <div key={index}>
       <div className="grid xl:grid-cols-2 md:grid-cols-2 grid-cols-1 gap-5 mb-4">
@@ -151,7 +158,7 @@ const CreatePurchaseOrder = () => {
             className="react-select mt-2"
             classNamePrefix="select"
             placeholder="Pilih Produk..."
-            options={dataProduct}
+            options={getFilteredOptions(index)}
             value={selectedVariantDetails[index]}
             onChange={(value) => handleVariantChange(value, index)}
           />
@@ -168,10 +175,16 @@ const CreatePurchaseOrder = () => {
           </div>
           <div className="flex-none relative">
             <button
-              className="inline-flex items-center justify-center h-10 w-10 bg-danger-500 text-lg border rounded border-danger-500 text-white"
+              className="inline-flex items-center justify-center h-10 w-10 bg-danger-500 text-lg border rounded border-danger-500 text-white mr-2"
               onClick={() => handleRemoveProduct(index)}
             >
               <Icon icon="heroicons:trash" />
+            </button>
+            <button
+              className="inline-flex items-center justify-center h-10 w-10 bg-primary-500 text-lg border rounded border-primary-500 text-white"
+              onClick={() => handleAddProduct(index)}
+            >
+              <Icon icon="heroicons:plus" />
             </button>
           </div>
         </div>
@@ -183,7 +196,7 @@ const CreatePurchaseOrder = () => {
         >
           <div>
             <p>Produk: {selectedVariantDetails[index].label}</p>
-            <p>Harga Produk: {selectedVariantDetails[index].extra}</p>
+            <p>Harga Produk: {selectedVariantDetails[index].extra ? selectedVariantDetails[index].extra : ""}</p>
           </div>
         </Alert>
       )}
@@ -251,7 +264,7 @@ const CreatePurchaseOrder = () => {
             <div className="">
               <Textinput
                 label="Nomor PO*"
-                type="number"
+                type="text"
                 placeholder="Masukkan nomor PO"
                 value={document_number}
                 onChange={(e) => setDocumentNumber(e.target.value)}
@@ -356,7 +369,7 @@ const CreatePurchaseOrder = () => {
                 placeholder="Pilih admin untuk persetujuaan PO *"
                 options={data_user?.map((item) => ({
                   value: item.uid,
-                  label: item?.profile?.first_name,
+                  label: `${item?.profile?.first_name} ${item?.profile?.last_name ? item?.profile?.last_name : "" }`,
                 }))}
                 onChange={(selectedOption) => setSelectedUser(selectedOption)}
                 value={selected_user}

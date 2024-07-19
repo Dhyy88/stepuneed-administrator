@@ -254,7 +254,7 @@ const Warehouses = () => {
     <>
       <div className="grid grid-cols-12 gap-6">
         <div className="lg:col-span-8 col-span-12">
-          <Card title="Data Admin Warehouse SJM">
+          <Card title="Data Admin Gudang ">
             <div className="flex items-center mb-4 justify-between ">
               <div className="flex items-center gap-3">
                 <div className="row-span-3 md:row-span-4 mb-2">
@@ -337,7 +337,7 @@ const Warehouses = () => {
                               Jenis Kelamin
                             </th>
                             <th scope="col" className=" table-th ">
-                              Cabang SJM
+                              Cabang 
                             </th>
                             <th scope="col" className=" table-th ">
                               Status
@@ -374,7 +374,7 @@ const Warehouses = () => {
                               Jenis Kelamin
                             </th>
                             <th scope="col" className=" table-th ">
-                              Cabang SJM
+                              Cabang 
                             </th>
                             <th scope="col" className=" table-th ">
                               Status
@@ -418,7 +418,7 @@ const Warehouses = () => {
                             Tanggal Lahir
                           </th>
                           <th scope="col" className=" table-th ">
-                            Cabang SJM
+                            Cabang 
                           </th>
                           <th scope="col" className=" table-th ">
                             Status
@@ -579,11 +579,11 @@ const Warehouses = () => {
           </Card>
         </div>
         <div className="lg:col-span-4 col-span-12">
-          <Card title={"Tambah Admin Warehouse"}>
+          <Card title={"Tambah Admin Gudang"}>
             <div className="text-sm text-slate-600 font-normal bg-white dark:bg-slate-900 dark:text-slate-300 rounded p-5">
               <div className="text-base text-slate-600 dark:text-slate-300 mb-4">
                 <label htmlFor=" hh" className="form-label ">
-                  Cabang SJM *
+                  Cabang  *
                 </label>
                 <Select
                   className="react-select mt-2"

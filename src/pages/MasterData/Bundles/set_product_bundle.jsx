@@ -15,7 +15,7 @@ import LoadingButton from "../../../components/LoadingButton";
 import { useParams } from "react-router-dom";
 import { index } from "d3-array";
 
-const SetProduct = () => {
+const SetProductBundle = () => {
   const navigate = useNavigate();
   let { uid } = useParams();
 
@@ -44,13 +44,9 @@ const SetProduct = () => {
             const variantsData = bundleData.variants.map((item) => ({
               variant: item.uid,
               alias: item.detail?.product_name_alias,
-              price: item.detail.price,
+              price: item.price,
               label: `${item.product.name} - ${item.sku}`,
-              // extra: `Rp ${item.detail.price.toLocaleString("id-ID")}`,
-              extra:
-              item?.detail?.buy_price !== null
-                ? `${item?.detail?.buy_price}`
-                : "",
+              extra: `Rp ${item.price.toLocaleString("id-ID")}`,
               value: item.uid,
             }));
 
@@ -120,11 +116,6 @@ const SetProduct = () => {
       updatedAlias[index] = selectedVariant.alias;
       setAlias(updatedAlias);
     }
-    if (selectedVariant) {
-      const updatePrice = [...price];
-      updatePrice[index] = selectedVariant.extra;
-      setPrice(updatePrice);
-    }
   };
 
   const handleAliasChange = (value, index) => {
@@ -144,18 +135,13 @@ const SetProduct = () => {
       const response = await axios.get(ApiEndpoint.ALL_VARIANT);
       const formattedVariants = response?.data?.data
         ?.flatMap((dataProduct) => {
-          // console.log(dataProduct);
           if (!dataProduct.variants || dataProduct.variants.length === 0) {
             return dataProduct
               ? {
                   value: dataProduct.uid,
-                  label: `${dataProduct.full_name}`,
+                  label: `${dataProduct.product.name} - ${dataProduct.sku}`,
                   alias: `${dataProduct.full_name}`,
-                  extra:
-                    dataProduct.buy_price !== null
-                      ? `${dataProduct.buy_price}`
-                      : "",
-                  // extra: `Rp ${dataProduct.buy_price.toLocaleString("id-ID")}`,
+                  extra: `Rp ${dataProduct.price.toLocaleString("id-ID")}`,
                 }
               : null;
           } else {
@@ -169,7 +155,7 @@ const SetProduct = () => {
             if (primaryVariantExistsInVariants) {
               return dataProduct.variants.map((variant) => ({
                 value: variant.uid,
-                label: `${dataProduct.product.name} `,
+                label: `${dataProduct.product.name} - ${variant.sku}`,
                 alias: `${dataProduct.full_name}`,
                 extra: `Rp. ${variant.price.toLocaleString("id-ID")}`,
               }));
@@ -179,7 +165,7 @@ const SetProduct = () => {
                 ? [
                     {
                       value: primaryVariant.uid,
-                      label: `${dataProduct.product.name}`,
+                      label: `${dataProduct.product.name} - ${primaryVariant.sku}`,
                       alias: `${dataProduct.full_name}`,
                       extra: `Rp ${primaryVariant.price.toLocaleString(
                         "id-ID"
@@ -192,7 +178,7 @@ const SetProduct = () => {
                 ...primaryVariantData,
                 ...dataProduct.variants.map((variant) => ({
                   value: variant.uid,
-                  label: `${dataProduct.product.name}`,
+                  label: `${dataProduct.product.name} - ${variant.sku}`,
                   alias: `${dataProduct.full_name}`,
                   extra: `Rp ${variant.price.toLocaleString("id-ID")}`,
                 })),
@@ -256,40 +242,26 @@ const SetProduct = () => {
             />
           </div>
           <div className="flex-none relative">
-            {/* <div className="flex justify-end mb-2">
-              <Button
-                text="Tambah Produk"
-                className="btn-primary light"
-                onClick={handleAddProduct}
-              />
-            </div> */}
-
             <button
-              className="inline-flex items-center justify-center h-10 w-10 bg-danger-500 text-lg border rounded border-danger-500 text-white mr-2"
+              className="inline-flex items-center justify-center h-10 w-10 bg-danger-500 text-lg border rounded border-danger-500 text-white"
               onClick={() => handleRemoveProduct(index)}
             >
               <Icon icon="heroicons:trash" />
             </button>
-            <button
-              className="inline-flex items-center justify-center h-10 w-10 bg-primary-500 text-lg border rounded border-primary-500 text-white"
-              onClick={() => handleAddProduct(index)}
-            >
-              <Icon icon="heroicons:plus" />
-            </button>
           </div>
         </div>
       </div>
-      {/* {selectedVariantDetails[index] && (
+      {selectedVariantDetails[index] && (
         <Alert
           icon="heroicons-outline:arrow-right"
           className="light-mode alert-success mb-5"
         >
           <div>
             <p>Nama Produk : {selectedVariantDetails[index].label}</p>
-            <p>Harga Beli : {selectedVariantDetails[index].extra}</p>
+            <p>Harga Jual : {selectedVariantDetails[index].extra}</p>
           </div>
         </Alert>
-      )} */}
+      )}
     </div>
   );
 
@@ -312,9 +284,8 @@ const SetProduct = () => {
           variants: variants.map((variant, index) => ({
             uid: variant,
             alias: alias[index],
-            price: price[index] || 0,
-          }))
-          .filter((variant) => variant.uid && variant.alias && variant.price),
+            price: price[index],
+          })),
         };
 
         await axios.post(
@@ -345,6 +316,17 @@ const SetProduct = () => {
   return (
     <div className="lg:col-span-12 col-span-12">
       <Card title={"Atur produk supplier"}>
+        {error &&
+          Object.values(error).map((errMsg, i) => (
+            <Alert
+              icon="heroicons-outline:exclamation"
+              className="light-mode alert-danger mb-5"
+            >
+              <span key={i} className="text-danger-600 text-xs py-2">
+                {errMsg}
+              </span>
+            </Alert>
+          ))}
         <Card className="mb-4">
           <div className="flex justify-end mb-2">
             <Button
@@ -375,4 +357,4 @@ const SetProduct = () => {
   );
 };
 
-export default SetProduct;
+export default SetProductBundle;

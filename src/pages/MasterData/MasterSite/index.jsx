@@ -46,7 +46,7 @@ const Sites = () => {
     try {
       const result = await Swal.fire({
         icon: "question",
-        title: "Apakah Anda yakin ingin menghapus cabang ini?",
+        title: "Apakah Anda yakin ingin menghapus toko ini?",
         text: "Anda tidak akan dapat mengembalikannya!",
         showCancelButton: true,
         confirmButtonText: "Ya, Hapus",
@@ -73,12 +73,12 @@ const Sites = () => {
           await axios.delete(`${ApiEndpoint.SITES}/${uid}`);
           Swal.fire(
             "Berhasil!",
-            "Anda berhasil menghapus data cabang ini.",
+            "Anda berhasil menghapus data toko ini.",
             "success"
           );
           getDataSite(query);
         } else {
-          Swal.fire("Batal", "Hapus data cabang dibatalkan.", "info");
+          Swal.fire("Batal", "Hapus data toko dibatalkan.", "info");
         }
       }
     } catch (err) {
@@ -94,12 +94,12 @@ const Sites = () => {
     <>
       <div className="grid grid-cols-12 gap-6">
         <div className="lg:col-span-12 col-span-12">
-          <Card title="Data Cabang SJM">
+          <Card title="Data Toko / Cabang ">
             <div className="md:flex justify-between items-center mb-4">
               <div className="md:flex items-center gap-3">
                 <div className="row-span-3 md:row-span-4">
                   <Button
-                    text="Tambah Cabang SJM"
+                    text="Tambah Toko / Cabang"
                     className="btn-primary dark w-full btn-sm "
                     onClick={() => navigate(`/site/create`)}
                   />
@@ -126,7 +126,7 @@ const Sites = () => {
                     onChange={(event) =>
                       setQuery({ ...query, search: event.target.value })
                     }
-                    placeholder="Cari cabang SJM..."
+                    placeholder="Cari cabang..."
                   />
                 </div>
               </div>
@@ -140,13 +140,13 @@ const Sites = () => {
                         <thead className="bg-slate-200 dark:bg-slate-700">
                           <tr>
                             <th scope="col" className=" table-th ">
-                              Kode Cabang
+                              Kode Toko / Cabang
                             </th>
                             <th scope="col" className=" table-th ">
-                              Nama Cabang
+                              Nama Toko / Cabang
                             </th>
                             <th scope="col" className=" table-th ">
-                              Tipe Cabang
+                              Tipe Toko / Cabang
                             </th>
                             <th scope="col" className=" table-th ">
                               Alamat
@@ -174,13 +174,13 @@ const Sites = () => {
                         <thead className="bg-slate-200 dark:bg-slate-700">
                           <tr>
                             <th scope="col" className=" table-th ">
-                              Kode Cabang
+                              Kode Toko / Cabang
                             </th>
                             <th scope="col" className=" table-th ">
-                              Nama Cabang
+                              Nama Toko / Cabang
                             </th>
                             <th scope="col" className=" table-th ">
-                              Tipe Cabang
+                              Tipe Toko / Cabang
                             </th>
                             <th scope="col" className=" table-th ">
                               Alamat
@@ -206,7 +206,7 @@ const Sites = () => {
                         </div>
                         <div className="w-full flex justify-center text-secondary">
                           <span className="text-slate-900 dark:text-white text-[20px] transition-all duration-300">
-                            Cabang SJM belum tersedia
+                            Toko / Cabang belum tersedia
                           </span>
                         </div>
                       </div>
@@ -216,13 +216,13 @@ const Sites = () => {
                       <thead className="bg-slate-200 dark:bg-slate-700">
                         <tr>
                           <th scope="col" className=" table-th ">
-                            Kode Cabang
+                            Kode Toko / Cabang
                           </th>
                           <th scope="col" className=" table-th ">
-                            Nama Cabang
+                            Nama Toko / Cabang
                           </th>
                           <th scope="col" className=" table-th ">
-                            Tipe Cabang
+                            Tipe Toko / Cabang
                           </th>
                           <th scope="col" className=" table-th ">
                             Alamat

@@ -87,7 +87,9 @@ const CreateBundle = () => {
               ? {
                   value: dataProduct.primary_variant.uid,
                   label: `${dataProduct.name} - ${dataProduct.primary_variant.sku}`,
-                  extra: `Rp ${dataProduct.primary_variant.price.toLocaleString("id-ID")}`,
+                  extra: `Rp ${dataProduct.primary_variant.price.toLocaleString(
+                    "id-ID"
+                  )}`,
                 }
               : null;
           } else {
@@ -111,7 +113,9 @@ const CreateBundle = () => {
                     {
                       value: primaryVariant.uid,
                       label: `${dataProduct.name} - ${primaryVariant.sku}`,
-                      extra: `Rp ${primaryVariant.price.toLocaleString("id-ID")}`,
+                      extra: `Rp ${primaryVariant.price.toLocaleString(
+                        "id-ID"
+                      )}`,
                     },
                   ]
                 : [];
@@ -139,6 +143,13 @@ const CreateBundle = () => {
     fetchVariants();
   }, []);
 
+  const getFilteredOptions = (index) => {
+    const selectedVariantIds = variants.filter((variant, i) => i !== index);
+    return dataProduct.filter(
+      (variant) => !selectedVariantIds.includes(variant.value)
+    );
+  };
+
   const renderVariantInputs = (index) => (
     <div key={index}>
       <div className="grid xl:grid-cols-3 md:grid-cols-4 grid-cols-1 gap-5 mb-4">
@@ -151,7 +162,7 @@ const CreateBundle = () => {
             className="react-select mt-2"
             classNamePrefix="select"
             placeholder="Pilih Produk..."
-            options={dataProduct}
+            options={getFilteredOptions(index)}
             value={selectedVariantDetails[index]}
             onChange={(value) => handleVariantChange(value, index)}
           />
@@ -193,7 +204,6 @@ const CreateBundle = () => {
           <div>
             <p>Produk: {selectedVariantDetails[index].label}</p>
             <p>Harga Produk: {selectedVariantDetails[index].extra}</p>
-           
           </div>
         </Alert>
       )}
@@ -235,7 +245,7 @@ const CreateBundle = () => {
           error.response &&
           error.response.data &&
           error.response.data.errors
-          ) {
+        ) {
           Swal.fire("Error!", error.response.data.message, "error");
           setError(error.response.data.errors);
         } else {

@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 import Product from "@/assets/images/logo/logopng.png";
 import Select from "react-select";
 
-const Products = () => {
+const VariantProducts = () => {
   const navigate = useNavigate();
   const [data, setData] = useState({
     data: [],
@@ -21,6 +21,7 @@ const Products = () => {
     prev_page_url: null,
     next_page_url: null,
   });
+  const [shop, setShop] = useState(null);
   const [category, setCategory] = useState(null);
   const [brand, setBrand] = useState(null);
   const [is_active, setIsActive] = useState("");
@@ -28,31 +29,31 @@ const Products = () => {
   const [selected_brand, setSelectedBrand] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-
   const [query, setQuery] = useState({
     search: "",
-    is_active: "",
-    paginate: 5,
+    page: "",
+    paginate: 8,
     category: "",
     brand: "",
+    is_primary: ""
   });
-
   const typeStatus = [
     { value: "", label: "Semua Status" },
     { value: "1", label: "Aktif" },
     { value: "0", label: "Nonaktif" },
   ];
 
+
   async function getDataProducts(query) {
     setIsLoading(true);
     try {
-      const response = await axios.post(ApiEndpoint.PRODUCTS, {
+      const response = await axios.post(ApiEndpoint.ALL_VARIANT, {
         page: query?.page,
         search: query?.search,
-        is_active: query?.is_active,
         paginate: 10,
         category: query?.category,
         brand: query?.brand,
+
       });
       setData(response?.data?.data);
       setIsLoading(false);
@@ -61,7 +62,6 @@ const Products = () => {
       Swal.fire("Gagal", err?.response?.data?.message, "error");
       setIsLoading(false);
     }
-    setIsLoading(false);
   }
 
   const getCategory = () => {
@@ -113,31 +113,31 @@ const Products = () => {
   };
 
   useEffect(() => {
-    getDataProducts(query);
-  }, [query]);
-
-  useEffect(() => {
     getCategory();
     getBrand();
   }, []);
+
+  useEffect(() => {
+    getDataProducts(query);
+  }, [query]);
 
   return (
     <>
       <div className="grid grid-cols-12 gap-6">
         <div className="lg:col-span-12 col-span-12">
-          <Card title="Data Produk">
-            <div className="md:flex justify-between items-center mb-4">
-              <div className="md:flex items-center gap-3">
+          <Card title="Data Variasi Produk">
+            <div className="md:flex justify-end items-center mb-4">
+              {/* <div className="md:flex items-center gap-3">
                 <div className="row-span-3 md:row-span-4">
                   <Button
                     text="Tambah Produk"
-                    className="btn-primary dark w-full btn-sm "
+                    className="btn-primary dark w-full btn-sm"
                     onClick={() => navigate(`/product/create`)}
                   />
                 </div>
-              </div>
+              </div> */}
               <div className="md:flex items-center gap-3">
-                <div className="row-span-3 md:row-span-4 w-48">
+                {/* <div className="row-span-3 md:row-span-4 w-48">
                   <Select
                     className="react-select py-2 w-full"
                     classNamePrefix="select"
@@ -150,8 +150,7 @@ const Products = () => {
                     }}
                     isClearable
                   />
-                </div>
-
+                </div> */}
                 <div className="row-span-3 md:row-span-4 w-48">
                   <Select
                     className="react-select py-2 w-full"
@@ -209,37 +208,40 @@ const Products = () => {
             </div>
             <div className="overflow-x-auto">
               <div className="inline-block min-w-full align-middle">
-                <div className="overflow-hidden ">
+                <div className="overflow-hidden">
                   {isLoading ? (
                     <>
                       <table className="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700">
                         <thead className="bg-slate-200 dark:bg-slate-700">
                           <tr>
-                            <th scope="col" className=" table-th ">
+                            <th scope="col" className="table-th">
                               Nama Produk
                             </th>
-                            <th scope="col" className=" table-th ">
-                              Brand
+                            <th scope="col" className="table-th">
+                              Warna
                             </th>
-                            <th scope="col" className=" table-th ">
-                              Kategori
+                            <th scope="col" className="table-th">
+                              Ukuran
                             </th>
-                            <th scope="col" className=" table-th ">
-                              Jenis Kelamin
+                            <th scope="col" className="table-th">
+                              SKU
                             </th>
-                            <th scope="col" className=" table-th ">
+                            <th scope="col" className="table-th">
+                              Barcode
+                            </th>
+                            <th scope="col" className="table-th">
+                              Harga Beli
+                            </th>
+                            <th scope="col" className="table-th">
                               Harga Jual
                             </th>
-                            <th scope="col" className=" table-th ">
+                            <th scope="col" className="table-th">
+                              Jenis Kelamin
+                            </th>
+                            <th scope="col" className="table-th">
                               Status
                             </th>
-                            <th scope="col" className=" table-th ">
-                              Total Stok
-                            </th>
-                            <th scope="col" className=" table-th ">
-                              Thumbnail
-                            </th>
-                            <th scope="col" className=" table-th ">
+                            <th scope="col" className="table-th">
                               Aksi
                             </th>
                           </tr>
@@ -255,31 +257,34 @@ const Products = () => {
                       <table className="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700">
                         <thead className="bg-slate-200 dark:bg-slate-700">
                           <tr>
-                            <th scope="col" className=" table-th ">
+                            <th scope="col" className="table-th">
                               Nama Produk
                             </th>
-                            <th scope="col" className=" table-th ">
-                              Brand
+                            <th scope="col" className="table-th">
+                              Warna
                             </th>
-                            <th scope="col" className=" table-th ">
-                              Kategori
+                            <th scope="col" className="table-th">
+                              Ukuran
                             </th>
-                            <th scope="col" className=" table-th ">
-                              Jenis Kelamin
+                            <th scope="col" className="table-th">
+                              SKU
                             </th>
-                            <th scope="col" className=" table-th ">
+                            <th scope="col" className="table-th">
+                              Barcode
+                            </th>
+                            <th scope="col" className="table-th">
+                              Harga Beli
+                            </th>
+                            <th scope="col" className="table-th">
                               Harga Jual
                             </th>
-                            <th scope="col" className=" table-th ">
+                            <th scope="col" className="table-th">
+                              Jenis Kelamin
+                            </th>
+                            <th scope="col" className="table-th">
                               Status
                             </th>
-                            <th scope="col" className=" table-th ">
-                              Total Stok
-                            </th>
-                            <th scope="col" className=" table-th ">
-                              Thumbnail
-                            </th>
-                            <th scope="col" className=" table-th ">
+                            <th scope="col" className="table-th">
                               Aksi
                             </th>
                           </tr>
@@ -303,31 +308,34 @@ const Products = () => {
                     <table className="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700">
                       <thead className="bg-slate-200 dark:bg-slate-700">
                         <tr>
-                          <th scope="col" className=" table-th ">
+                          <th scope="col" className="table-th">
                             Nama Produk
                           </th>
-                          <th scope="col" className=" table-th ">
-                            Brand
+                          <th scope="col" className="table-th">
+                            Warna
                           </th>
-                          <th scope="col" className=" table-th ">
-                            Kategori
+                          <th scope="col" className="table-th">
+                            Ukuran
                           </th>
-                          <th scope="col" className=" table-th ">
-                            Jenis Kelamin
+                          <th scope="col" className="table-th">
+                            SKU
                           </th>
-                          <th scope="col" className=" table-th ">
+                          <th scope="col" className="table-th">
+                            Barcode
+                          </th>
+                          <th scope="col" className="table-th">
+                            Harga Beli
+                          </th>
+                          <th scope="col" className="table-th">
                             Harga Jual
                           </th>
-                          <th scope="col" className=" table-th ">
+                          <th scope="col" className="table-th">
+                            Jenis Kelamin
+                          </th>
+                          <th scope="col" className="table-th">
                             Status
                           </th>
-                          <th scope="col" className=" table-th ">
-                            Total Stok
-                          </th>
-                          <th scope="col" className=" table-th ">
-                            Thumbnail
-                          </th>
-                          <th scope="col" className=" table-th ">
+                          <th scope="col" className="table-th">
                             Aksi
                           </th>
                         </tr>
@@ -335,24 +343,45 @@ const Products = () => {
                       <tbody className="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
                         {data?.data?.map((item, index) => (
                           <tr key={index}>
-                            <td className="table-td">{item?.full_name} </td>
-                            <td className="table-td">{item?.brand?.name} </td>
                             <td className="table-td">
-                              {item?.category?.name}{" "}
+                              {item?.product?.full_name}
                             </td>
-                            <td className="table-td">{item?.gender} </td>
                             <td className="table-td">
-                              {item?.primary_variant?.sell_price ? (
+                              {item?.variant_one ? item.variant_one : "-"}
+                            </td>
+                            <td className="table-td">
+                              {item?.variant_two ? item.variant_two : "-"}
+                            </td>
+
+                            <td className="table-td">
+                              {item?.sku ? item?.sku : "-"}
+                            </td>
+                            <td className="table-td">
+                              {item?.barcode ? item?.barcode : "-"}
+                            </td>
+                            <td className="table-td">
+                              {item?.buy_price ? (
                                 <span>
-                                  Rp {item?.primary_variant?.sell_price.toLocaleString("id-ID")}
+                                  Rp {item?.buy_price.toLocaleString("id-ID")}
                                 </span>
                               ) : (
                                 <span>-</span>
                               )}
                             </td>
-
                             <td className="table-td">
-                              {item?.is_active === true ? (
+                              {item?.sell_price ? (
+                                <span>
+                                  Rp {item?.sell_price.toLocaleString("id-ID")}
+                                </span>
+                              ) : (
+                                <span>-</span>
+                              )}
+                            </td>
+                            <td className="table-td">
+                              {item?.product?.gender}
+                            </td>
+                            <td className="table-td">
+                              {item?.product?.is_active ? (
                                 <span className="inline-block px-3 min-w-[90px] text-center mx-auto py-1 rounded-[999px] bg-opacity-25 text-success-500 bg-success-500">
                                   Aktif
                                 </span>
@@ -362,23 +391,6 @@ const Products = () => {
                                 </span>
                               )}
                             </td>
-                            <td className="table-td">{item?.stocks_count}</td>
-                            <td className="table-td">
-                              {item?.primary_image?.url ? (
-                                <img
-                                  src={item?.primary_image?.url}
-                                  alt=""
-                                  className="w-16 h-16 object-cover rounded-full"
-                                />
-                              ) : (
-                                <img
-                                  src={Product}
-                                  alt=""
-                                  className="w-16 h-16 object-cover rounded-full"
-                                />
-                              )}
-                            </td>
-
                             <td className="table-td">
                               <div className="flex space-x-3 rtl:space-x-reverse">
                                 <Tooltip
@@ -391,7 +403,9 @@ const Products = () => {
                                     className="action-btn"
                                     type="button"
                                     onClick={() =>
-                                      navigate(`/product/detail/${item.uid}`)
+                                      navigate(
+                                        `/product/detail/${item?.product?.uid}`
+                                      )
                                     }
                                   >
                                     <Icon icon="heroicons:eye" />
@@ -409,7 +423,7 @@ const Products = () => {
                   <ul className="pagination">
                     <li>
                       <button
-                        className="text-xl leading-4 text-slate-900 dark:text-white h-6  w-6 flex  items-center justify-center flex-col prev-next-btn "
+                        className="text-xl leading-4 text-slate-900 dark:text-white h-6 w-6 flex items-center justify-center flex-col prev-next-btn"
                         onClick={handleFirstPagination}
                       >
                         <Icon icon="heroicons-outline:chevron-double-left" />
@@ -417,13 +431,12 @@ const Products = () => {
                     </li>
                     <li>
                       <button
-                        className="text-xl leading-4 text-slate-900 dark:text-white h-6  w-6 flex  items-center justify-center flex-col prev-next-btn "
+                        className="text-xl leading-4 text-slate-900 dark:text-white h-6 w-6 flex items-center justify-center flex-col prev-next-btn"
                         onClick={handlePrevPagination}
                       >
                         <Icon icon="heroicons-outline:chevron-left" />
                       </button>
                     </li>
-
                     {generatePageNumbers().map((pageNumber) => (
                       <li key={pageNumber.page}>
                         <button
@@ -438,10 +451,9 @@ const Products = () => {
                         </button>
                       </li>
                     ))}
-
                     <li>
                       <button
-                        className="text-xl leading-4 text-slate-900 dark:text-white h-6  w-6 flex  items-center justify-center flex-col prev-next-btn "
+                        className="text-xl leading-4 text-slate-900 dark:text-white h-6 w-6 flex items-center justify-center flex-col prev-next-btn"
                         onClick={handleNextPagination}
                       >
                         <Icon icon="heroicons-outline:chevron-right" />
@@ -449,7 +461,7 @@ const Products = () => {
                     </li>
                     <li>
                       <button
-                        className="text-xl leading-4 text-slate-900 dark:text-white h-6  w-6 flex  items-center justify-center flex-col prev-next-btn "
+                        className="text-xl leading-4 text-slate-900 dark:text-white h-6 w-6 flex items-center justify-center flex-col prev-next-btn"
                         onClick={handleLastPagination}
                       >
                         <Icon icon="heroicons-outline:chevron-double-right" />
@@ -466,4 +478,4 @@ const Products = () => {
   );
 };
 
-export default Products;
+export default VariantProducts;

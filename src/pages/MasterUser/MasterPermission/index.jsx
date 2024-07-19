@@ -59,7 +59,7 @@ const Permissions = () => {
     try {
       const result = await Swal.fire({
         icon: "question",
-        title: "Apakah Anda yakin ingin menghapus cabang ini?",
+        title: "Apakah Anda yakin ingin menghapus data role ini?",
         text: "Anda tidak akan dapat mengembalikannya!",
         showCancelButton: true,
         confirmButtonText: "Ya, Hapus",
@@ -152,12 +152,12 @@ const Permissions = () => {
     <>
       <div className="grid grid-cols-12 gap-6">
         <div className="lg:col-span-12 col-span-12">
-          <Card title="Data Role Admin SJM">
+          <Card title="Data Role Admin ">
             <div className="md:flex justify-between items-center mb-4">
               <div className="md:flex items-center gap-3">
                 <div className="row-span-3 md:row-span-4">
                   <Button
-                    text="Tambah Role Admin SJM"
+                    text="Tambah Role Admin "
                     className="btn-primary dark w-full btn-sm "
                     onClick={() => navigate(`/permission/create`)}
                   />
@@ -169,7 +169,7 @@ const Permissions = () => {
                     onChange={(event) =>
                       setQuery({ ...query, search: event.target.value })
                     }
-                    placeholder="Cari role SJM..."
+                    placeholder="Cari role ..."
                   />
                 </div>
               </div>
@@ -225,7 +225,7 @@ const Permissions = () => {
                         </div>
                         <div className="w-full flex justify-center text-secondary">
                           <span className="text-slate-900 dark:text-white text-[20px] transition-all duration-300">
-                            Role admin SJM belum tersedia
+                            Role admin  belum tersedia
                           </span>
                         </div>
                       </div>

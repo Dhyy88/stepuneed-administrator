@@ -10,66 +10,61 @@ export const menuItems = [
   //Menu Master Inventory
   {
     isHeadr: true,
-    title: "Master Data SJM",
+    title: "Master Data",
   },
   {
-    title: "Master Produk",
+    title: "Brand",
+    icon: "heroicons-outline:tag",
+    isOpen: true,
+    isHide: true,
+    link: '/brands'
+  },
+  {
+    title: "Kategori",
+    icon: "heroicons-outline:puzzle-piece",
+    isOpen: true,
+    isHide: true,
+    link: '/categories'
+  },
+  {
+    title: "Produk",
     icon: "heroicons-outline:rectangle-group",
     link: "/app/home",
     child: [
       {
-        childtitle: "Data Produk",
+        childtitle: "List Produk",
         childlink: "/products",
-        multi_menu: [
-          {
-            multiTitle: "List Produk",
-            multiLink: "products",
-          },
-          {
-            multiTitle: "Tambah Produk",
-            multiLink: "product/create",
-          },
-        ],
       },
       {
-        childtitle: "Data Kategori",
-        childlink: "/categories",
+        childtitle: "List Variasi Produk",
+        childlink: "/productvariants",
       },
       {
-        childtitle: "Data Supplier",
-        childlink: "/suppliers",
+        childtitle: "Tambah Produk",
+        childlink: "/product/create",
       },
     ]
   },
+  //Menu Master Toko
   {
-    title: "Master Mobil",
-    icon: "heroicons-outline:truck",
-    link: "/app/home",
-    child: [
-      {
-        childtitle: "Data Brand Mobil",
-        childlink: "/brands"
-      },  
-      {
-        childtitle: "Data Model Mobil",
-        childlink: "/cars"
-      },  
-    ]
+    title: "Supplier",
+    icon: "heroicons-outline:building-storefront",
+    isOpen: true,
+    isHide: true,
+    link: '/suppliers'
   },
-
-  //Menu Master Cabang
   {
-    title: "Master Cabang SJM",
+    title: "Toko/Cabang",
     icon: "heroicons-outline:building-office-2",
     link: "/app/home",
     child: [
       {
-        childtitle: "Data Cabang SJM",
+        childtitle: "Data Toko/Cabang",
         childlink: "/sites",
         isHide: false,
       },
       {
-        childtitle: "Tambah Cabang SJM",
+        childtitle: "Tambah Toko/Cabang",
         childlink: "/site/create",
         // isHide: true,
       }
@@ -77,7 +72,7 @@ export const menuItems = [
   },
 
   {
-    title: "Master PO",
+    title: "Data PO",
     icon: "heroicons-outline:clipboard-document-list",
     link: "/app/home",
     child: [
@@ -96,107 +91,135 @@ export const menuItems = [
     ]
   },
 
+  {
+    title: "Data Stok",
+    icon: "heroicons-outline:inbox-stack",
+    link: "/app/home",
+    child: [
+      {
+        childtitle: "Stok Toko/Cabang",
+        childlink: "/stocks"
+      },  
+      {
+        childtitle: "Stok Manual",
+        childlink: "/manualstocks"
+      },  
+    ]
+  },
+
   //Menu Master Dealer
 
-  {
-    isHeadr: true,
-    title: "Master Data Sales",
-  },
+  // {
+  //   isHeadr: true,
+  //   title: "Master Data Sales",
+  // },
 
-  {
-    title: "Master Produk",
-    icon: "heroicons-outline:rectangle-group",
-    link: "/app/home",
-    child: [
-      {
-        childtitle: "Data Bundle Produk",
-        childlink: "/bundles",
-        isHide: false,
-      },
-      {
-        childtitle: "Data Konten Army",
-        childlink: "/contents/army",
-        // isHide: true,
-      }
-    ]
-  },
+  // {
+  //   title: "Master Produk",
+  //   icon: "heroicons-outline:rectangle-group",
+  //   link: "/app/home",
+  //   child: [
+  //     {
+  //       childtitle: "Data Bundle Produk",
+  //       childlink: "/bundles",
+  //       isHide: false,
+  //     },
+  //     {
+  //       childtitle: "Data Konten Army",
+  //       childlink: "/contents/army",
+  //       // isHide: true,
+  //     }
+  //   ]
+  // },
 
   //Menu Master Sales
-  {
-    title: "Sales",
-    icon: "heroicons-outline:user-group",
-    link: "/app/home",
-    child: [
-      {
-        childtitle: "Sales Army",
-        childlink: "/army",
-      },
-      {
-        childtitle: "SPV Sales Army",
-        childlink: "/spvarmy",
-      },
-      {
-        childtitle: "Customer Sales Army",
-        childlink: "/customerarmy",
-      },
-      {
-        childtitle: "Sales Internal",
-        childlink: "/coming-soon"
-      }
-    ]
-  },
+  // {
+  //   title: "Sales",
+  //   icon: "heroicons-outline:user-group",
+  //   link: "/app/home",
+  //   child: [
+  //     {
+  //       childtitle: "Sales Army",
+  //       childlink: "/army",
+  //     },
+  //     {
+  //       childtitle: "SPV Sales Army",
+  //       childlink: "/spvarmy",
+  //     },
+  //     {
+  //       childtitle: "Customer Sales Army",
+  //       childlink: "/customerarmy",
+  //     },
+  //     {
+  //       childtitle: "Sales Internal",
+  //       childlink: "/coming-soon"
+  //     }
+  //   ]
+  // },
 
-  {
-    title: "Master Dealer Sales",
-    icon: "heroicons-outline:truck",
-    link: "/dealers",
-  },
+  // {
+  //   title: "Master Dealer Sales",
+  //   icon: "heroicons-outline:truck",
+  //   link: "/dealers",
+  // },
 
-  {
-    isHeadr: true,
-    title: "Master Pengguna SJM",
-    isHide: true,
-  },
+  // {
+  //   isHeadr: true,
+  //   title: "Master Pengguna SJM",
+  //   isHide: true,
+  // },
 
   //Menu Master Pengguna
   {
-    title: "Admin Office",
+    isHeadr: true,
+    title: "Master Pengguna",
+  },
+  {
+    title: "Admin Kantor",
     icon: "heroicons-outline:users",
     link: "/app/home",
     child: [
       {
-        childtitle: "Admin Office",
+        childtitle: "Admin Kantor",
         childlink: "/users",
         childicon: "heroicons-outline:users",
       },
       {
-        childtitle: "Role Admin Office",
+        childtitle: "Role Admin Kantor",
         childlink: "/permissions",
         childicon: "heroicons-outline:shield-exclamation",
       },
     ]
   },
   {
-    title: "Admin Warehouse",
+    title: "Admin Gudang",
     icon: "heroicons-outline:users",
     link: "/app/home",
     child: [
       {
-        childtitle: "Admin Warehouse",
+        childtitle: "Admin Gudang",
         childlink: "/warehouse",
         childicon: "heroicons-outline:users",
       },
       {
-        childtitle: "Admin SPV Warehouse",
+        childtitle: "Admin SPV Gudang",
         childlink: "/warehousespv",
         childicon: "heroicons-outline:users",
       },
     ]
   },
+  {
+    title: "Admin Kasir",
+    icon: "heroicons-outline:users",
+    isOpen: true,
+    isHide: true,
+    link: '/cashiers'
+  },  
+  
 
   {
     isHeadr: true,
-    title: "Laporan SJM",
+    title: "Laporan ",
   },
 
   {
@@ -230,152 +253,148 @@ export const topMenu = [
     link: "/app/home",
     megamenu: [
       {
-        megamenutitle: "Master Produk SJM",
+        megamenutitle: "Master Produk",
         megamenuicon: "heroicons-outline:rectangle-group",
         singleMegamenu: [
           {
-            m_childtitle: "Data Brand Mobil",
+            m_childtitle: "List Brand",
             m_childlink: "/brands",
           },
           {
-            m_childtitle: "Data Model Mobil",
-            m_childlink: "/cars",
-          },
-          {
-            m_childtitle: "Data Supplier",
-            m_childlink: "/suppliers",
-          },
-          {
-            m_childtitle: "Data Kategori",
+            m_childtitle: "List Kategori",
             m_childlink: "/categories",
           },
           {
-            m_childtitle: "Data Produk",
+            m_childtitle: "List Supplier",
+            m_childlink: "/suppliers",
+          },
+          {
+            m_childtitle: "List Produk",
             m_childlink: "/products",
+          },
+          {
+            m_childtitle: "List Variasi Produk",
+            m_childlink: "/productvariants",
           },
         ],
       },
       {
-        megamenutitle: "Master Divisi SJM",
+        megamenutitle: "Master Cabang/Toko",
         megamenuicon: "heroicons-outline:building-office-2",
         singleMegamenu: [
           {
-            m_childtitle: "Data Cabang SJM",
+            m_childtitle: "List Cabang/Toko",
             m_childlink: "/sites",
           },
           {
-            m_childtitle: "Tambah Cabang SJM",
+            m_childtitle: "Tambah Cabang/Toko",
             m_childlink: "/site/create",
           },
           
         ],
       },
+      {
+        megamenutitle: "Master PO",
+        megamenuicon: "heroicons-outline:clipboard-document-list",
+        singleMegamenu: [
+          {
+            m_childtitle: "List Permintaan PO",
+            m_childlink: "/pobyme",
+          },
+          {
+            m_childtitle: "List Persetujuan PO",
+            m_childlink: "/poapprove",
+          },
+          {
+            m_childtitle: "Tambah PO",
+            m_childlink: "/po/create",
+          },
+          
+        ],
+      },
+      {
+        megamenutitle: "Master Pengguna",
+        megamenuicon: "heroicons-outline:chip",
+        singleMegamenu: [
+          {
+            m_childtitle: "Admin Kantor",
+            m_childlink: "/users",
+          },
+          {
+            m_childtitle: "Admin SPV Gudang",
+            m_childlink: "/warehousespv",
+          },
+          {
+            m_childtitle: "Admin Gudang",
+            m_childlink: "/warehouse",
+          },
+          {
+            m_childtitle: "Pengaturan Perijinan Akun",
+            m_childlink: "/permissions",
+          },
+          
+        ],
+      },
       
-      {
-        megamenutitle: "Master Data Sales",
-        megamenuicon: "heroicons-outline:rectangle-group",
-        singleMegamenu: [
-          {
-            m_childtitle: "Data Dealer Sales",
-            m_childlink: "/dealers",
-          },
-          {
-            m_childtitle: "Data Bundle Produk",
-            m_childlink: "/bundles",
-          },
-          {
-            m_childtitle: "Data Konten Army",
-            m_childlink: "/contents/army",
-          },
-        ],
-      },
-      {
-        megamenutitle: "Master Pengguna Sales Army",
-        megamenuicon: "heroicons-outline:user-group",
-        singleMegamenu: [
-          {
-            m_childtitle: "Data Sales Army",
-            m_childlink: "/army",
-          },
-          {
-            m_childtitle: "Data Sales SPV Army ",
-            m_childlink: "/spvarmy",
-          },
-          {
-            m_childtitle: "Data Customer Sales Army ",
-            m_childlink: "/customerarmy",
-          },
-        ],
-      },
-      {
-        megamenutitle: "Master Pengguna SJM",
-        megamenuicon: "heroicons-outline:user-group",
-        singleMegamenu: [
-          {
-            m_childtitle: "Data Sales Internal",
-            m_childlink: "/coming-soon",
-          },
-        ],
-      },
     ],
   },
 
   // Master PO
 
-  {
-    title: "Master PO",
-    icon: "heroicons-outline:clipboard-document-list",
-    link: "/app/home",
-    isHide: true,
-    child: [
-      {
-        childtitle: "Data Permintaan PO",
-        link: "/pobyme",
-        childicon: "heroicons-outline:folder-arrow-down",
-      },
-      {
-        childtitle: "Data Persetujuan PO",
-        link: "/poapprove",
-        childicon: "heroicons-outline:document-check",
-      },
-      {
-        childtitle: "Tambah PO",
-        link: "/po/create",
-        childicon: "heroicons-outline:plus-circle",
-      },
-    ],
-  },
+  // {
+  //   title: "Master PO",
+  //   icon: "heroicons-outline:clipboard-document-list",
+  //   link: "/app/home",
+  //   isHide: true,
+  //   child: [
+  //     {
+  //       childtitle: "Data Permintaan PO",
+  //       link: "/pobyme",
+  //       childicon: "heroicons-outline:folder-arrow-down",
+  //     },
+  //     {
+  //       childtitle: "Data Persetujuan PO",
+  //       link: "/poapprove",
+  //       childicon: "heroicons-outline:document-check",
+  //     },
+  //     {
+  //       childtitle: "Tambah PO",
+  //       link: "/po/create",
+  //       childicon: "heroicons-outline:plus-circle",
+  //     },
+  //   ],
+  // },
 
   //Menu Master Pengguna
 
-  {
-    title: "Pengguna SJM",
-    icon: "heroicons-outline:chip",
-    link: "/app/home",
-    isHide: true,
-    child: [
-      {
-        childtitle: "Admin Warehouse",
-        link: "/warehouse",
-        childicon: "heroicons-outline:user",
-      },
-      {
-        childtitle: "Admin SPV Warehouse",
-        link: "/warehousespv",
-        childicon: "heroicons-outline:user-circle",
-      },
-      {
-        childtitle: "Admin Office",
-        link: "/users",
-        childicon: "heroicons-outline:users",
-      },
-      {
-        childtitle: "Role Admin Office",
-        link: "/permissions",
-        childicon: "heroicons-outline:shield-exclamation",
-      },
-    ],
-  },
+  // {
+  //   title: "Pengguna SJM",
+  //   icon: "heroicons-outline:chip",
+  //   link: "/app/home",
+  //   isHide: true,
+  //   child: [
+  //     {
+  //       childtitle: "Admin Warehouse",
+  //       link: "/warehouse",
+  //       childicon: "heroicons-outline:user",
+  //     },
+  //     {
+  //       childtitle: "Admin SPV Warehouse",
+  //       link: "/warehousespv",
+  //       childicon: "heroicons-outline:user-circle",
+  //     },
+  //     {
+  //       childtitle: "Admin Office",
+  //       link: "/users",
+  //       childicon: "heroicons-outline:users",
+  //     },
+  //     {
+  //       childtitle: "Role Admin Office",
+  //       link: "/permissions",
+  //       childicon: "heroicons-outline:shield-exclamation",
+  //     },
+  //   ],
+  // },
 
   //Master Report
 

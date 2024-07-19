@@ -11,8 +11,9 @@ import Loading from "../../../components/Loading";
 import { useNavigate } from "react-router-dom";
 import Product from "@/assets/images/logo/logopng.png";
 import Select from "react-select";
+import Alert from "@/components/ui/Alert";
 
-const Products = () => {
+const StocksSite = () => {
   const navigate = useNavigate();
   const [data, setData] = useState({
     data: [],
@@ -21,59 +22,49 @@ const Products = () => {
     prev_page_url: null,
     next_page_url: null,
   });
-  const [category, setCategory] = useState(null);
-  const [brand, setBrand] = useState(null);
-  const [is_active, setIsActive] = useState("");
-  const [selected_category, setSelectedCategory] = useState(null);
-  const [selected_brand, setSelectedBrand] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [site, setSite] = useState(null);
+  const [selectedSite, setSelectedSite] = useState(null);
 
   const [query, setQuery] = useState({
     search: "",
-    is_active: "",
     paginate: 5,
-    category: "",
-    brand: "",
+    site: "",
   });
-
-  const typeStatus = [
-    { value: "", label: "Semua Status" },
-    { value: "1", label: "Aktif" },
-    { value: "0", label: "Nonaktif" },
-  ];
 
   async function getDataProducts(query) {
     setIsLoading(true);
     try {
-      const response = await axios.post(ApiEndpoint.PRODUCTS, {
+      const response = await axios.post(ApiEndpoint.STOCK, {
         page: query?.page,
         search: query?.search,
-        is_active: query?.is_active,
-        paginate: 10,
-        category: query?.category,
-        brand: query?.brand,
+        paginate: 8,
+        site: query?.site,
       });
       setData(response?.data?.data);
       setIsLoading(false);
     } catch (err) {
-      setError(err.response.data.message);
+      setError(err?.response?.data?.message);
       Swal.fire("Gagal", err?.response?.data?.message, "error");
       setIsLoading(false);
     }
     setIsLoading(false);
   }
 
-  const getCategory = () => {
-    axios.get(ApiEndpoint.CATEGORY).then((response) => {
-      setCategory(response?.data?.data);
-    });
-  };
+  const getSite = async () => {
+    try {
+      const store_response = await axios.get(ApiEndpoint.WAREHOUSE_LIST);
+      const whstore_response = await axios.get(ApiEndpoint.STORE_WH_LIST);
+      const site_response = [
+        ...store_response?.data?.data,
+        ...whstore_response?.data?.data,
+      ];
 
-  const getBrand = () => {
-    axios.get(ApiEndpoint.BRANDS).then((response) => {
-      setBrand(response?.data?.data);
-    });
+      setSite(site_response);
+    } catch (error) {
+      Swal.fire("Gagal", error.response.data.message, "error");
+    }
   };
 
   const handlePrevPagination = () => {
@@ -117,85 +108,44 @@ const Products = () => {
   }, [query]);
 
   useEffect(() => {
-    getCategory();
-    getBrand();
+    getSite();
   }, []);
 
   return (
     <>
       <div className="grid grid-cols-12 gap-6">
         <div className="lg:col-span-12 col-span-12">
-          <Card title="Data Produk">
-            <div className="md:flex justify-between items-center mb-4">
-              <div className="md:flex items-center gap-3">
-                <div className="row-span-3 md:row-span-4">
-                  <Button
-                    text="Tambah Produk"
-                    className="btn-primary dark w-full btn-sm "
-                    onClick={() => navigate(`/product/create`)}
-                  />
-                </div>
-              </div>
+          <Card title="Data Stok Produk Berdasarkan Cabang">
+            <Alert
+              icon="heroicons-outline:exclamation"
+              className="light-mode alert-primary mb-5"
+            >
+              Silahkan melakukan filter toko atau cabang terlebih dahulu untuk
+              melihat stok tiap toko atau cabang !
+            </Alert>
+            <div className="md:flex justify-end items-center mb-4">
               <div className="md:flex items-center gap-3">
                 <div className="row-span-3 md:row-span-4 w-48">
                   <Select
                     className="react-select py-2 w-full"
                     classNamePrefix="select"
-                    placeholder="Filter status..."
-                    options={typeStatus}
-                    value={is_active}
-                    onChange={(value) => {
-                      setQuery({ ...query, is_active: value?.value });
-                      setIsActive(value);
-                    }}
-                    isClearable
-                  />
-                </div>
-
-                <div className="row-span-3 md:row-span-4 w-48">
-                  <Select
-                    className="react-select py-2 w-full"
-                    classNamePrefix="select"
-                    placeholder="Filter kategori..."
+                    placeholder="Filter cabang..."
                     options={[
-                      { value: "", label: "Semua Kategori" },
-                      ...(category?.map((item) => ({
+                      { value: "", label: "Semua Cabang" },
+                      ...(site?.map((item) => ({
                         value: item.uid,
                         label: item.name,
                       })) || []),
                     ]}
                     onChange={(value) => {
-                      setQuery({ ...query, category: value?.value });
-                      setSelectedCategory(value);
+                      setQuery({ ...query, site: value?.value });
+                      setSelectedSite(value);
                     }}
-                    value={selected_category}
+                    value={selectedSite}
                     showSearch
                     isClearable
                   />
                 </div>
-
-                <div className="row-span-3 md:row-span-4 w-48">
-                  <Select
-                    className="react-select py-2 w-full"
-                    classNamePrefix="select"
-                    placeholder="Filter brand..."
-                    options={[
-                      { value: "", label: "Semua Brand" },
-                      ...(brand?.map((item) => ({
-                        value: item.uid,
-                        label: item.name,
-                      })) || []),
-                    ]}
-                    onChange={(value) => {
-                      setQuery({ ...query, brand: value?.value });
-                      setSelectedBrand(value);
-                    }}
-                    value={selected_brand}
-                    showSearch
-                    isClearable
-                  />
-                </div>
-
                 <div className="row-span-3 md:row-span-4">
                   <Textinput
                     // value={query || ""}
@@ -219,28 +169,13 @@ const Products = () => {
                               Nama Produk
                             </th>
                             <th scope="col" className=" table-th ">
-                              Brand
-                            </th>
-                            <th scope="col" className=" table-th ">
-                              Kategori
-                            </th>
-                            <th scope="col" className=" table-th ">
-                              Jenis Kelamin
+                              Harga Beli
                             </th>
                             <th scope="col" className=" table-th ">
                               Harga Jual
                             </th>
                             <th scope="col" className=" table-th ">
-                              Status
-                            </th>
-                            <th scope="col" className=" table-th ">
                               Total Stok
-                            </th>
-                            <th scope="col" className=" table-th ">
-                              Thumbnail
-                            </th>
-                            <th scope="col" className=" table-th ">
-                              Aksi
                             </th>
                           </tr>
                         </thead>
@@ -259,28 +194,13 @@ const Products = () => {
                               Nama Produk
                             </th>
                             <th scope="col" className=" table-th ">
-                              Brand
-                            </th>
-                            <th scope="col" className=" table-th ">
-                              Kategori
-                            </th>
-                            <th scope="col" className=" table-th ">
-                              Jenis Kelamin
+                              Harga Beli
                             </th>
                             <th scope="col" className=" table-th ">
                               Harga Jual
                             </th>
                             <th scope="col" className=" table-th ">
-                              Status
-                            </th>
-                            <th scope="col" className=" table-th ">
                               Total Stok
-                            </th>
-                            <th scope="col" className=" table-th ">
-                              Thumbnail
-                            </th>
-                            <th scope="col" className=" table-th ">
-                              Aksi
                             </th>
                           </tr>
                         </thead>
@@ -307,28 +227,13 @@ const Products = () => {
                             Nama Produk
                           </th>
                           <th scope="col" className=" table-th ">
-                            Brand
-                          </th>
-                          <th scope="col" className=" table-th ">
-                            Kategori
-                          </th>
-                          <th scope="col" className=" table-th ">
-                            Jenis Kelamin
+                            Harga Beli
                           </th>
                           <th scope="col" className=" table-th ">
                             Harga Jual
                           </th>
                           <th scope="col" className=" table-th ">
-                            Status
-                          </th>
-                          <th scope="col" className=" table-th ">
                             Total Stok
-                          </th>
-                          <th scope="col" className=" table-th ">
-                            Thumbnail
-                          </th>
-                          <th scope="col" className=" table-th ">
-                            Aksi
                           </th>
                         </tr>
                       </thead>
@@ -336,69 +241,25 @@ const Products = () => {
                         {data?.data?.map((item, index) => (
                           <tr key={index}>
                             <td className="table-td">{item?.full_name} </td>
-                            <td className="table-td">{item?.brand?.name} </td>
                             <td className="table-td">
-                              {item?.category?.name}{" "}
-                            </td>
-                            <td className="table-td">{item?.gender} </td>
-                            <td className="table-td">
-                              {item?.primary_variant?.sell_price ? (
+                              {item?.buy_price ? (
                                 <span>
-                                  Rp {item?.primary_variant?.sell_price.toLocaleString("id-ID")}
+                                  Rp {item?.buy_price.toLocaleString("id-ID")}
                                 </span>
                               ) : (
                                 <span>-</span>
                               )}
                             </td>
-
                             <td className="table-td">
-                              {item?.is_active === true ? (
-                                <span className="inline-block px-3 min-w-[90px] text-center mx-auto py-1 rounded-[999px] bg-opacity-25 text-success-500 bg-success-500">
-                                  Aktif
+                              {item?.sell_price ? (
+                                <span>
+                                  Rp {item?.sell_price.toLocaleString("id-ID")}
                                 </span>
                               ) : (
-                                <span className="inline-block px-3 min-w-[90px] text-center mx-auto py-1 rounded-[999px] bg-opacity-25 text-danger-500 bg-danger-500">
-                                  Nonaktif
-                                </span>
+                                <span>-</span>
                               )}
                             </td>
                             <td className="table-td">{item?.stocks_count}</td>
-                            <td className="table-td">
-                              {item?.primary_image?.url ? (
-                                <img
-                                  src={item?.primary_image?.url}
-                                  alt=""
-                                  className="w-16 h-16 object-cover rounded-full"
-                                />
-                              ) : (
-                                <img
-                                  src={Product}
-                                  alt=""
-                                  className="w-16 h-16 object-cover rounded-full"
-                                />
-                              )}
-                            </td>
-
-                            <td className="table-td">
-                              <div className="flex space-x-3 rtl:space-x-reverse">
-                                <Tooltip
-                                  content="Detail Produk"
-                                  placement="top"
-                                  arrow
-                                  animation="shift-away"
-                                >
-                                  <button
-                                    className="action-btn"
-                                    type="button"
-                                    onClick={() =>
-                                      navigate(`/product/detail/${item.uid}`)
-                                    }
-                                  >
-                                    <Icon icon="heroicons:eye" />
-                                  </button>
-                                </Tooltip>
-                              </div>
-                            </td>
                           </tr>
                         ))}
                       </tbody>
@@ -466,4 +327,4 @@ const Products = () => {
   );
 };
 
-export default Products;
+export default StocksSite;

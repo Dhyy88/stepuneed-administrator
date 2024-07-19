@@ -106,7 +106,7 @@ const UpdatePermission = () => {
   return (
     <>
       <div className="lg:col-span-12 col-span-12">
-        <Card title={"Tambah Akses Admin SJM"}>
+        <Card title={"Tambah Akses Admin"}>
           <div className="grid xl:grid-cols-1 md:grid-cols-1 grid-cols-1 gap-5 mb-5">
             <div className="">
               <Textinput

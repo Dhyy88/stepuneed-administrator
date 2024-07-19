@@ -33,9 +33,8 @@ const DetailStockOpnameReport = () => {
   return (
     <div>
       <div className="space-y-5 profile-page">
-
         <div className="grid grid-cols-12 gap-6 ">
-          <div className="lg:col-span-4 col-span-12">
+          <div className="lg:col-span-3 col-span-12">
             <Card title="Info Stock Opname" className="mb-4">
               <ul className="list space-y-8">
                 <li className="flex space-x-3 rtl:space-x-reverse">
@@ -89,7 +88,7 @@ const DetailStockOpnameReport = () => {
             </Card>
           </div>
 
-          <div className="lg:col-span-8 col-span-12">
+          <div className="lg:col-span-9 col-span-12">
             <Card title="Info Produk" className="mb-4">
               <div className="py-4 px-6">
                 <div className="">
@@ -102,10 +101,13 @@ const DetailStockOpnameReport = () => {
                               SKU
                             </th>
                             <th scope="col" className=" table-th ">
+                              Barcode
+                            </th>
+                            <th scope="col" className=" table-th ">
                               Nama Produk
                             </th>
                             <th scope="col" className=" table-th ">
-                              Jumlah Keseluruhan Stok
+                              Stok Keseluruhan
                             </th>
                             <th scope="col" className=" table-th ">
                               Pelaporan Stok
@@ -114,7 +116,10 @@ const DetailStockOpnameReport = () => {
                               Sisa Stok
                             </th>
                             <th scope="col" className=" table-th ">
-                              Harga
+                              Harga Beli
+                            </th>
+                            <th scope="col" className=" table-th ">
+                              Harga Jual
                             </th>
                           </tr>
                         </thead>
@@ -133,10 +138,13 @@ const DetailStockOpnameReport = () => {
                               SKU
                             </th>
                             <th scope="col" className=" table-th ">
+                              Barcode
+                            </th>
+                            <th scope="col" className=" table-th ">
                               Nama Produk
                             </th>
                             <th scope="col" className=" table-th ">
-                              Jumlah Keseluruhan Stok
+                              Stok Keseluruhan
                             </th>
                             <th scope="col" className=" table-th ">
                               Pelaporan Stok
@@ -145,7 +153,10 @@ const DetailStockOpnameReport = () => {
                               Sisa Stok
                             </th>
                             <th scope="col" className=" table-th ">
-                              Harga
+                              Harga Beli
+                            </th>
+                            <th scope="col" className=" table-th ">
+                              Harga Jual
                             </th>
                           </tr>
                         </thead>
@@ -172,19 +183,25 @@ const DetailStockOpnameReport = () => {
                             SKU
                           </th>
                           <th scope="col" className=" table-th ">
+                            Barcode
+                          </th>
+                          <th scope="col" className=" table-th ">
                             Nama Produk
                           </th>
                           <th scope="col" className=" table-th ">
-                            Jumlah Keseluruhan Stok
+                            Stok Fisik
                           </th>
                           <th scope="col" className=" table-th ">
                             Pelaporan Stok
                           </th>
                           <th scope="col" className=" table-th ">
-                            Sisa Stok
+                            Selisih Stok
                           </th>
                           <th scope="col" className=" table-th ">
-                            Harga
+                            Harga Beli
+                          </th>
+                          <th scope="col" className=" table-th ">
+                            Harga Jual
                           </th>
                         </tr>
                       </thead>
@@ -192,14 +209,32 @@ const DetailStockOpnameReport = () => {
                         {data?.stock_opname_details?.map((item, index) => (
                           <tr key={index}>
                             <td className="table-td">
-                              {item?.variant?.sku}
+                              {item?.variant?.sku ? item?.variant?.sku : "-"}
                             </td>
-                            <td className="table-td">{item?.variant?.product?.name}</td>
+                            <td className="table-td">
+                              {item?.variant?.barcode
+                                ? item?.variant?.barcode
+                                : "-"}
+                            </td>
+                            <td className="table-td">
+                              {item?.variant?.full_name}
+                            </td>
                             <td className="table-td">{item?.real_qty}</td>
                             <td className="table-td">{item?.report_qty}</td>
-                            <td className="table-td">{item?.missing_qty}</td>
                             <td className="table-td">
-                              Rp {item?.variant?.price.toLocaleString("id-ID")}
+                              <span className="text-red-500 font-bold">
+                                {item?.missing_qty}
+                              </span>
+                            </td>
+                            <td className="table-td">
+                              Rp{" "}
+                              {item?.variant?.buy_price.toLocaleString("id-ID")}
+                            </td>
+                            <td className="table-td">
+                              Rp{" "}
+                              {item?.variant?.sell_price.toLocaleString(
+                                "id-ID"
+                              )}
                             </td>
                           </tr>
                         ))}

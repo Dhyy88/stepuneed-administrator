@@ -211,23 +211,16 @@ const DetailUser = () => {
             </div>
           </div>
 
-          <div className="profile-info-500 md:flex md:text-start text-center flex-1 max-w-[516px] md:space-y-0 space-y-4">
+          <div className="profile-info-500 md:flex md:text-end text-center flex-1 max-w-[516px] md:space-y-0 space-y-4">
             <div className="flex-1">
               <div className="text-base text-slate-900 dark:text-slate-300 font-medium mb-1">
-                Tanggal Registrasi
+                Tanggal Verifikasi
               </div>
               <div className="text-sm text-slate-600 font-light dark:text-slate-300">
-                {data?.registered_at}
+                {data?.email_verified_at}
               </div>
             </div>
-            <div className="flex-1">
-              <div className="text-base text-slate-900 dark:text-slate-300 font-medium mb-1">
-                Posisi
-              </div>
-              <div className="text-sm text-slate-600 font-light dark:text-slate-300">
-                Head Office
-              </div>
-            </div>
+           
             <div className="flex-1">
               <div className="text-base text-slate-900 dark:text-slate-300 font-medium mb-1">
                 Status Akun
@@ -266,7 +259,7 @@ const DetailUser = () => {
                       <div className="uppercase text-xs text-slate-500 dark:text-slate-300 mb-1 leading-[12px]">
                         No Telepon
                       </div>
-                      {data?.profile?.phone_number}
+                      {data?.profile?.phone_number ? data?.profile?.phone_number : "-"}
                     </div>
 
                     <div className="flex-none text-2xl text-slate-600 dark:text-slate-300">
@@ -277,7 +270,7 @@ const DetailUser = () => {
                         Tanggal Lahir
                       </div>
                       <div className="text-base text-slate-600 dark:text-slate-50">
-                        {data?.profile?.birth}
+                        {data?.profile?.birth ? data?.profile?.birth : "-"}
                       </div>
                     </div>
                   </li>

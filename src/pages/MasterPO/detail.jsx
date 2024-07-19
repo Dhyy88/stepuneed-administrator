@@ -587,7 +587,12 @@ const DetailPurchaseOrder = () => {
                               Rp {item?.price.toLocaleString("id-ID")}
                             </td>
                             <td className="table-td">{item?.quantity}</td>
-                            <td className="table-td">{item?.qty_remaining}</td>
+                            <td className="table-td">
+                              <span className="text-red-500 font-bold">
+                                {item?.qty_remaining}
+                              </span>
+                            </td>
+                         
                             <td className="table-td">
                               Rp {item?.total_price.toLocaleString("id-ID")}
                             </td>

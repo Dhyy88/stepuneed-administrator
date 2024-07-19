@@ -142,44 +142,19 @@ const DetailProducts = () => {
                 <div className="text-3xl font-medium text-slate-900 dark:text-slate-200 mb-[3px]">
                   {data?.name ? <>{data?.name}</> : <span>-</span>}
                 </div>
-                {/* <div className="text-sm font-light text-slate-600 dark:text-slate-400">
-                  {data?.uid}
-                </div> */}
+                <div className="text-sm font-light text-slate-600 dark:text-slate-400">
+                  {data?.slug}
+                </div>
               </div>
             </div>
           </div>
 
           <div className="profile-info-500 md:flex md:text-start text-center flex-1 max-w-[516px] md:space-y-0 space-y-4">
             <div className="flex-1">
-              <div className="text-base text-slate-900 dark:text-slate-300 font-medium mb-1">
-                SKU Utama
-              </div>
-              <div className="text-sm text-slate-600 font-light dark:text-slate-300">
-                {data?.primary_variant?.sku}
-              </div>
-            </div>
-            <div className="flex-1">
-              <div className="text-base text-slate-900 dark:text-slate-300 font-medium mb-1">
-                Status Konten
-              </div>
-              <div className="text-sm text-slate-600 font-light dark:text-slate-300">
-                {data?.is_display_in_army_content === true && (
-                  <span className="inline-block px-3 min-w-[90px] text-center mx-auto py-1 rounded-[999px] bg-opacity-25 text-success-500 bg-success-500">
-                    Tampil
-                  </span>
-                )}
-                {data?.is_display_in_army_content === false && (
-                  <span className="inline-block px-3 min-w-[90px] text-center mx-auto py-1 rounded-[999px] bg-opacity-25 text-danger-500 bg-danger-500">
-                    Tidak Tampil
-                  </span>
-                )}
-              </div>
-            </div>
-            <div className="flex-1">
-              <div className="text-base text-slate-900 dark:text-slate-300 font-medium mb-1">
+              <div className="text-base text-slate-900 dark:text-slate-300 font-medium mb-1 flex  justify-end">
                 Status Produk
               </div>
-              <div className="text-sm text-slate-600 font-light dark:text-slate-300">
+              <div className="text-sm text-slate-600 font-light dark:text-slate-300  flex  justify-end">
                 <Switch
                   label={data?.is_active ? "Aktif" : "Nonaktif"}
                   activeClass="bg-success-500"
@@ -199,32 +174,56 @@ const DetailProducts = () => {
             <Card title="Info Produk" className="mb-4">
               <ul className="list space-y-8">
                 <li className="flex space-x-3 rtl:space-x-reverse">
-                  <div className="flex-none text-2xl text-slate-600 dark:text-slate-300">
-                    <Icon icon="heroicons:currency-dollar" />
+                  <div className="flex-1">
+                    <div className="uppercase text-xs text-slate-500 dark:text-slate-300 mb-1 leading-[12px]">
+                      Kategori
+                    </div>
+                    {data?.category?.name}
                   </div>
                   <div className="flex-1">
                     <div className="uppercase text-xs text-slate-500 dark:text-slate-300 mb-1 leading-[12px]">
-                      Minimal pesanan
+                      Brand
+                    </div>
+                    {data?.brand?.name}
+                  </div>
+                  <div className="flex-1">
+                    <div className="uppercase text-xs text-slate-500 dark:text-slate-300 mb-1 leading-[12px]">
+                      Min Order
                     </div>
                     {data?.minimal_order} Produk
                   </div>
                 </li>
 
                 <li className="flex space-x-3 rtl:space-x-reverse">
-                  <div className="flex-none text-2xl text-slate-600 dark:text-slate-300">
-                    <Icon icon="heroicons:calendar" />
+                  <div className="flex-1">
+                    <div className="uppercase text-xs text-slate-500 dark:text-slate-300 mb-1 leading-[12px]">
+                      Panjang (cm)
+                    </div>
+                    {data?.length ? data?.length : "-"}
                   </div>
                   <div className="flex-1">
                     <div className="uppercase text-xs text-slate-500 dark:text-slate-300 mb-1 leading-[12px]">
-                      Garansi Produk
+                      Lebar (cm)
                     </div>
-                    <div className="text-base text-slate-600 dark:text-slate-50">
-                      {data?.warranty ? (
-                        <>{data?.warranty} Bulan</>
-                      ) : (
-                        <span>-</span>
-                      )}
+                    {data?.width ? data?.width : "-"}
+                  </div>
+                  <div className="flex-1">
+                    <div className="uppercase text-xs text-slate-500 dark:text-slate-300 mb-1 leading-[12px]">
+                      Tinggi (cm)
                     </div>
+                    {data?.height ? data?.height : "-"}
+                  </div>
+                </li>
+                <li className="flex space-x-3 rtl:space-x-reverse">
+                  <div className="flex-1">
+                    <div className="uppercase text-xs text-slate-500 dark:text-slate-300 mb-1 leading-[12px]">
+                      Total Stok
+                    </div>
+                    {data?.stocks_count ? (
+                      <>{data?.stocks_count} Produk</>
+                    ) : (
+                      <span>-</span>
+                    )}
                   </div>
                 </li>
               </ul>
@@ -332,16 +331,28 @@ const DetailProducts = () => {
                                 SKU
                               </th>
                               <th scope="col" className=" table-th ">
-                                Harga
+                                Barcode
                               </th>
                               <th scope="col" className=" table-th ">
-                                Atribut
+                                Berat Produk
                               </th>
                               <th scope="col" className=" table-th ">
-                                Gambar Varian
+                                Warna
                               </th>
                               <th scope="col" className=" table-th ">
-                                Varian Utama
+                                Ukuran
+                              </th>
+                              <th scope="col" className=" table-th ">
+                                Harga Beli
+                              </th>
+                              <th scope="col" className=" table-th ">
+                                Harga Jual
+                              </th>
+                              <th scope="col" className=" table-th ">
+                                Total Stok
+                              </th>
+                              <th scope="col" className=" table-th ">
+                                Variasi Utama
                               </th>
                             </tr>
                           </thead>
@@ -360,19 +371,28 @@ const DetailProducts = () => {
                                 SKU
                               </th>
                               <th scope="col" className=" table-th ">
-                                Harga
+                                Barcode
                               </th>
                               <th scope="col" className=" table-th ">
-                                Atribut Varian
+                                Warna
                               </th>
                               <th scope="col" className=" table-th ">
-                                Model Mobil
+                                Ukuran
                               </th>
                               <th scope="col" className=" table-th ">
-                                Gambar Varian
+                                Berat Produk
                               </th>
                               <th scope="col" className=" table-th ">
-                                Varian Utama
+                                Harga Beli
+                              </th>
+                              <th scope="col" className=" table-th ">
+                                Harga Jual
+                              </th>
+                              <th scope="col" className=" table-th ">
+                                Total Stok
+                              </th>
+                              <th scope="col" className=" table-th ">
+                                Variasi Utama
                               </th>
                             </tr>
                           </thead>
@@ -398,62 +418,72 @@ const DetailProducts = () => {
                               SKU
                             </th>
                             <th scope="col" className=" table-th ">
-                              Harga
+                              Barcode
                             </th>
                             <th scope="col" className=" table-th ">
-                              Atribut Varian
+                              Warna
                             </th>
                             <th scope="col" className=" table-th ">
-                              Model Mobil
+                              Ukuran
                             </th>
                             <th scope="col" className=" table-th ">
-                              Gambar Varian
+                              Berat Produk
                             </th>
                             <th scope="col" className=" table-th ">
-                              Varian Utama
+                              Harga Beli
+                            </th>
+                            <th scope="col" className=" table-th ">
+                              Harga Jual
+                            </th>
+                            <th scope="col" className=" table-th ">
+                              Total Stok
+                            </th>
+                            <th scope="col" className=" table-th ">
+                              Variasi Utama
                             </th>
                           </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
                           {data?.variants?.map((item, index) => (
                             <tr key={index}>
-                              <td className="table-td">{item?.sku}</td>
                               <td className="table-td">
-                                {item?.price ? (
+                                {item?.sku ? item?.sku : "-"}
+                              </td>
+                              <td className="table-td">
+                                {item?.barcode ? item?.barcode : "-"}
+                              </td>
+                              <td className="table-td">
+                                {item?.variant_one ? item?.variant_one : "-"}
+                              </td>
+                              <td className="table-td">
+                                {item?.variant_two ? item?.variant_two : "-"}
+                              </td>
+                              <td className="table-td">
+                                {item?.weight ? item?.weight : "0"} gram
+                              </td>
+                              <td className="table-td">
+                                {item?.buy_price ? (
                                   <span>
-                                    Rp {item?.price.toLocaleString("id-ID")}
+                                    Rp {item?.buy_price.toLocaleString("id-ID")}
                                   </span>
                                 ) : (
                                   <span>-</span>
                                 )}
                               </td>
                               <td className="table-td">
-                                {item?.variant_attribute ? (
-                                  <span>{item?.variant_attribute}</span>
+                                {item?.sell_price ? (
+                                  <span>
+                                    Rp{" "}
+                                    {item?.sell_price.toLocaleString("id-ID")}
+                                  </span>
                                 ) : (
                                   <span>-</span>
                                 )}
                               </td>
                               <td className="table-td">
-                                {item?.car_model
-                                  ? item.car_model.model
-                                  : "-"}
+                                {item?.stocks_count ? item?.stocks_count : "0"}
                               </td>
-                              <td className="table-td">
-                                {item?.image?.url ? (
-                                  <img
-                                    src={item?.image?.url}
-                                    alt=""
-                                    className="w-16 h-16 object-cover rounded-full"
-                                  />
-                                ) : (
-                                  <img
-                                    src={Product}
-                                    alt=""
-                                    className="w-16 h-16 object-cover rounded-full"
-                                  />
-                                )}
-                              </td>
+
                               <td className="table-td">
                                 {item?.is_primary === true ? (
                                   <span className="inline-block px-3 min-w-[90px] text-center mx-auto py-1 rounded-[999px] bg-opacity-25 text-success-500 bg-success-500">

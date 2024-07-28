@@ -14,7 +14,7 @@ import Loading from "../../../components/Loading";
 import LoadingButton from "../../../components/LoadingButton";
 import Switch from "@/components/ui/Switch";
 
-const Cashiers = () => {
+const Sales = () => {
   const [data, setData] = useState({
     data: [],
     current_page: 1,
@@ -43,10 +43,10 @@ const Cashiers = () => {
   const [selectedSite, setSelectedSite] = useState(null);
   const [is_active, setIsActive] = useState("");
 
-  async function getDataCashier(query) {
+  async function getDataSales(query) {
     setIsLoading(true);
     try {
-      const response = await axios.post(ApiEndpoint.CASHIER, {
+      const response = await axios.post(ApiEndpoint.SALES, {
         page: query?.page,
         search: query?.search,
         gender: query?.gender,
@@ -63,7 +63,7 @@ const Cashiers = () => {
   }
 
   useEffect(() => {
-    getDataCashier(query);
+    getDataSales(query);
   }, [query]);
 
   const getSite = async () => {
@@ -98,7 +98,7 @@ const Cashiers = () => {
 
     if (confirmResult.isConfirmed) {
       try {
-        await axios.post(ApiEndpoint.CASHIER_CREATE, {
+        await axios.post(ApiEndpoint.SALES_CREATE, {
           site: selectedSite?.value,
           email: email,
           first_name: first_name,
@@ -108,7 +108,7 @@ const Cashiers = () => {
           birth: birth,
         });
         Swal.fire("Sukses", "Data pengguna berhasil ditambahkan.", "success");
-        getDataCashier(query);
+        getDataSales(query);
         resetForm();
         setIsLoadingButton(false);
       } catch (err) {
@@ -149,15 +149,15 @@ const Cashiers = () => {
         });
 
         if (input && input.trim().toLowerCase() === "hapus") {
-          await axios.delete(`${ApiEndpoint.CASHIER}/${uid}`);
+          await axios.delete(`${ApiEndpoint.SALES}/${uid}`);
           Swal.fire(
             "Berhasil!",
             "Anda berhasil menghapus data akun ini.",
             "success"
           );
-          getDataCashier(query);
+          getDataSales(query);
         } else {
-          Swal.fire("Batal", "Hapus data akun kasir dibatalkan.", "info");
+          Swal.fire("Batal", "Hapus data akun sales dibatalkan.", "info");
         }
       }
     } catch (err) {
@@ -190,7 +190,7 @@ const Cashiers = () => {
           payload
         );
         setIsActive(!is_active);
-        getDataCashier(query);
+        getDataSales(query);
       } else {
 
       }
@@ -254,7 +254,7 @@ const Cashiers = () => {
     <>
       <div className="grid grid-cols-12 gap-6">
         <div className="lg:col-span-8 col-span-12">
-          <Card title="Data Admin Kasir ">
+          <Card title="Data Sales ">
             <div className="flex items-center mb-4 justify-between ">
               <div className="flex items-center gap-3">
                 <div className="row-span-3 md:row-span-4 mb-2">
@@ -308,7 +308,7 @@ const Cashiers = () => {
                     onChange={(event) =>
                       setQuery({ ...query, search: event.target.value })
                     }
-                    placeholder="Cari kasir..."
+                    placeholder="Cari sales..."
                   />
                 </div>
               </div>
@@ -393,7 +393,7 @@ const Cashiers = () => {
                         </div>
                         <div className="w-full flex justify-center text-secondary">
                           <span className="text-slate-900 dark:text-white text-[20px] transition-all duration-300">
-                            Pengguna Kasir belum tersedia
+                            Pengguna sales belum tersedia
                           </span>
                         </div>
                       </div>
@@ -579,7 +579,7 @@ const Cashiers = () => {
           </Card>
         </div>
         <div className="lg:col-span-4 col-span-12">
-          <Card title={"Tambah Admin Kasir"}>
+          <Card title={"Tambah Admin sales"}>
             <div className="text-sm text-slate-600 font-normal bg-white dark:bg-slate-900 dark:text-slate-300 rounded p-5">
               <div className="text-base text-slate-600 dark:text-slate-300 mb-4">
                 <label htmlFor=" hh" className="form-label ">
@@ -725,4 +725,4 @@ const Cashiers = () => {
   );
 };
 
-export default Cashiers;
+export default Sales;

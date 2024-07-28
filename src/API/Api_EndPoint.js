@@ -35,6 +35,13 @@ const ApiEndpoint = {
     WAREHOUSE_LIST: 'ho/sites/warehouse',
     STORE_WH_LIST: 'ho/sites/store-warehouse',
 
+    //SITE AREA
+    CASHIER: "ho/cashiers",
+    CASHIER_CREATE: "ho/cashiers/create",
+
+    SALES: "ho/sales",
+    SALES_CREATE: "ho/sales/create",
+
     //WAREHOUSE AREA
     WAREHOUSE: 'ho/warehouses',
     CREATE_WAREHOUSE: 'ho/warehouses/create',

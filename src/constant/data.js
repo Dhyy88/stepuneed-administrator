@@ -215,6 +215,13 @@ export const menuItems = [
     isHide: true,
     link: '/cashiers'
   },  
+  {
+    title: "Sales",
+    icon: "heroicons-outline:users",
+    isOpen: true,
+    isHide: true,
+    link: '/sales'
+  },  
   
 
   {
@@ -327,6 +334,14 @@ export const topMenu = [
           {
             m_childtitle: "Admin Gudang",
             m_childlink: "/warehouse",
+          },
+          {
+            m_childtitle: "Admin Kasir",
+            m_childlink: "/cashiers",
+          },
+          {
+            m_childtitle: "Sales",
+            m_childlink: "/sales",
           },
           {
             m_childtitle: "Pengaturan Perijinan Akun",

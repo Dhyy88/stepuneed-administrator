@@ -45,6 +45,7 @@ const Permissions = lazy(() => import("./pages/MasterUser/MasterPermission"));
 const CreatePermission = lazy(() => import('./pages/MasterUser/MasterPermission/create'));
 const UpdatePermission = lazy(() => import('./pages/MasterUser/MasterPermission/update'));
 const Cashiers = lazy(() => import("./pages/MasterUser/MasterCashier"));
+const Sales = lazy(() => import("./pages/MasterUser/MasterSales"));
 
 // Master Data
 const Products = lazy(() => import("./pages/MasterData/Product"));
@@ -170,7 +171,9 @@ function App() {
               <Route path="users" element={ <Suspense fallback={<Loading />}> <UserProtect /> </Suspense> } />
               
               <Route path="users/detail/:uid" element={<DetailUser />} />
+
               <Route path="cashiers" element={<Cashiers />} />
+              <Route path="sales" element={<Sales />} />
 
               {/* Route Permission */}
               <Route path="permissions" element={<Permissions />} />

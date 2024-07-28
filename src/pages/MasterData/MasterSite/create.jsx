@@ -24,7 +24,7 @@ const CreateSite = () => {
 
   const typeSite = [
     { value: "storewh", label: "Toko & Gudang" },
-    { value: "store", label: "Toko" },
+    // { value: "store", label: "Toko" },
     { value: "warehouse", label: "Gudang" },
   ];
 
@@ -35,6 +35,7 @@ const CreateSite = () => {
 
   const onSubmit = async () => {
     setIsLoadingButton(true);
+    
     const confirmResult = await Swal.fire({
       title: "Konfirmasi",
       text: "Anda yakin data yang dimasukkan sudah benar?",

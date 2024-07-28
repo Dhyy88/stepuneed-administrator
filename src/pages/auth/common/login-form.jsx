@@ -83,6 +83,7 @@ const LoginForm = () => {
 
   return (
     <form onSubmit={loginHandler} className="space-y-4 ">
+    {/* <form onSubmit={ navigate("/dashboard")} className="space-y-4 "> */}
       <Textinput
         name="email"
         label="email"

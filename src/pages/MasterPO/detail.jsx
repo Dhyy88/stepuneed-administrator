@@ -14,6 +14,8 @@ import userDarkMode from "@/hooks/useDarkMode";
 import MainLogo from "@/assets/images/logo/logo.svg";
 import LogoWhite from "@/assets/images/logo/logo-white.svg";
 
+import Textinput from "@/components/ui/Textinput";
+
 const DetailPurchaseOrder = () => {
   let { uid } = useParams();
   const navigate = useNavigate();
@@ -22,6 +24,81 @@ const DetailPurchaseOrder = () => {
   const [error, setError] = useState("");
   const [isApproveLoading, setIsApproveLoading] = useState(false);
   const [isRejectLoading, setIsRejectLoading] = useState(false);
+
+  const [products, setProducts] = useState({
+    products: [],
+    current_page: 1,
+    last_page: 1,
+    prev_page_url: null,
+    next_page_url: null,
+  });
+
+  const [query, setQuery] = useState({
+    search: "",
+    product: [uid],
+    paginate: 1,
+  });
+
+  async function getProducts(query) {
+    setIsLoading(true);
+    try {
+      const response = await axios.post(`${ApiEndpoint.PO}/${uid}/products`, {
+        page: query?.page,
+        paginate: 10,
+        search: query?.search,
+        product: [uid],
+      });
+      setProducts(response?.data?.data);
+      setIsLoading(false);
+    } catch (err) {
+      setError(err);
+      setIsLoading(false);
+    }
+  }
+
+  const handlePrevPagination = () => {
+    if (products.prev_page_url) {
+      setQuery({ ...query, page: products.current_page - 1 });
+    }
+  };
+
+  const handleNextPagination = () => {
+    if (products.next_page_url) {
+      setQuery({ ...query, page: products.current_page + 1 });
+    }
+  };
+
+  const handleFirstPagination = () => {
+    setQuery({ ...query, page: 1 });
+  };
+
+  const handleLastPagination = () => {
+    setQuery({ ...query, page: products?.last_page });
+  };
+
+  const generatePageNumbers = () => {
+    const totalPages = products?.last_page;
+    const maxPageNumbers = 5;
+    const currentPage = products?.current_page;
+    const middlePage = Math.floor(maxPageNumbers / 2);
+    const startPage = Math.max(currentPage - middlePage, 1);
+    const endPage = Math.min(startPage + maxPageNumbers - 1, totalPages);
+
+    const pageNumbers = [];
+    for (let page = startPage; page <= endPage; page++) {
+      pageNumbers.push({ page, active: page === currentPage });
+    }
+
+    return pageNumbers;
+  };
+
+  useEffect(() => {
+    getProducts(query);
+  }, [query]);
+
+  useEffect(() => {
+    getDataById();
+  }, [uid]);
 
   const printPage = () => {
     setIsLoading(true);
@@ -164,10 +241,6 @@ const DetailPurchaseOrder = () => {
       setIsRejectLoading(false);
     }
   };
-
-  useEffect(() => {
-    getDataById();
-  }, [uid]);
 
   return (
     <div>
@@ -489,74 +562,22 @@ const DetailPurchaseOrder = () => {
 
           <div className="lg:col-span-8 col-span-12">
             <Card title="Info Produk" className="mb-4">
+              <div className="md:flex justify-end items-center py-4 px-6">
+                <div className="md:flex items-center gap-3">
+                  <div className="row-span-3 md:row-span-4">
+                    <Textinput
+                      // value={query || ""}
+                      onChange={(event) =>
+                        setQuery({ ...query, search: event.target.value })
+                      }
+                      placeholder="Cari produk..."
+                    />
+                  </div>
+                </div>
+              </div>
               <div className="py-4 px-6">
-                <div className="">
-                  {isLoading ? (
-                    <>
-                      <table className="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700">
-                        <thead className="bg-slate-200 dark:bg-slate-700">
-                          <tr>
-                            <th scope="col" className=" table-th ">
-                              Nama Produk
-                            </th>
-                            <th scope="col" className=" table-th ">
-                              Harga Produk
-                            </th>
-                            <th scope="col" className=" table-th ">
-                              Jumlah Keseluruhan Stok
-                            </th>
-                            <th scope="col" className=" table-th ">
-                              Sisa Stok
-                            </th>
-                            <th scope="col" className=" table-th ">
-                              Total Harga
-                            </th>
-                          </tr>
-                        </thead>
-                      </table>
-
-                      <div className="w-full flex justify-center text-secondary p-10">
-                        <Loading />
-                      </div>
-                    </>
-                  ) : data?.products?.length === 0 ? (
-                    <>
-                      <table className="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700">
-                        <thead className="bg-slate-200 dark:bg-slate-700">
-                          <tr>
-                            <th scope="col" className=" table-th ">
-                              Nama Produk
-                            </th>
-                            <th scope="col" className=" table-th ">
-                              Harga Produk
-                            </th>
-                            <th scope="col" className=" table-th ">
-                              Jumlah Keseluruhan Stok
-                            </th>
-                            <th scope="col" className=" table-th ">
-                              Sisa Stok
-                            </th>
-                            <th scope="col" className=" table-th ">
-                              Total Harga
-                            </th>
-                          </tr>
-                        </thead>
-                      </table>
-
-                      <div className="w-full flex flex-col justify-center text-secondary p-10">
-                        <div className="w-full flex justify-center mb-3">
-                          <span className="text-slate-900 dark:text-white text-[100px] transition-all duration-300">
-                            <Icon icon="heroicons:information-circle" />
-                          </span>
-                        </div>
-                        <div className="w-full flex justify-center text-secondary">
-                          <span className="text-slate-900 dark:text-white text-[20px] transition-all duration-300">
-                            Produk belum tersedia
-                          </span>
-                        </div>
-                      </div>
-                    </>
-                  ) : (
+                {isLoading ? (
+                  <>
                     <table className="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700">
                       <thead className="bg-slate-200 dark:bg-slate-700">
                         <tr>
@@ -567,40 +588,154 @@ const DetailPurchaseOrder = () => {
                             Harga Produk
                           </th>
                           <th scope="col" className=" table-th ">
-                            Jumlah Keseluruhan Stok
+                            Sisa Stok
                           </th>
                           <th scope="col" className=" table-th ">
-                            Sisa Stok
+                            Total Stok
                           </th>
                           <th scope="col" className=" table-th ">
                             Total Harga
                           </th>
                         </tr>
                       </thead>
-                      <tbody className="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
-                        {data?.purchase_order_products?.map((item, index) => (
-                          <tr key={index}>
-                            <td className="table-td">
-                              {item?.item_description}
-                            </td>
-                            <td className="table-td">
-                              Rp {item?.price.toLocaleString("id-ID")}
-                            </td>
-                            <td className="table-td">{item?.quantity}</td>
-                            <td className="table-td">
-                              <span className="text-red-500 font-bold">
-                                {item?.qty_remaining}
-                              </span>
-                            </td>
-                         
-                            <td className="table-td">
-                              Rp {item?.total_price.toLocaleString("id-ID")}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
                     </table>
-                  )}
+
+                    <div className="w-full flex justify-center text-secondary p-10">
+                      <Loading />
+                    </div>
+                  </>
+                ) : data?.products?.length === 0 ? (
+                  <>
+                    <table className="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700">
+                      <thead className="bg-slate-200 dark:bg-slate-700">
+                        <tr>
+                          <th scope="col" className=" table-th ">
+                            Nama Produk
+                          </th>
+                          <th scope="col" className=" table-th ">
+                            Harga Produk
+                          </th>
+                          <th scope="col" className=" table-th ">
+                            Sisa Stok
+                          </th>
+                          <th scope="col" className=" table-th ">
+                            Total Stok
+                          </th>
+                          <th scope="col" className=" table-th ">
+                            Total Harga
+                          </th>
+                        </tr>
+                      </thead>
+                    </table>
+
+                    <div className="w-full flex flex-col justify-center text-secondary p-10">
+                      <div className="w-full flex justify-center mb-3">
+                        <span className="text-slate-900 dark:text-white text-[100px] transition-all duration-300">
+                          <Icon icon="heroicons:information-circle" />
+                        </span>
+                      </div>
+                      <div className="w-full flex justify-center text-secondary">
+                        <span className="text-slate-900 dark:text-white text-[20px] transition-all duration-300">
+                          Produk belum tersedia
+                        </span>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <table className="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700">
+                    <thead className="bg-slate-200 dark:bg-slate-700">
+                      <tr>
+                        <th scope="col" className=" table-th ">
+                          Nama Produk
+                        </th>
+                        <th scope="col" className=" table-th ">
+                          Harga Produk
+                        </th>
+                        <th scope="col" className=" table-th ">
+                          Total Stok
+                        </th>
+                        <th scope="col" className=" table-th ">
+                          Sisa Stok
+                        </th>
+                        <th scope="col" className=" table-th ">
+                          Total Harga
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700">
+                      {products?.data?.map((item, index) => (
+                        <tr key={index}>
+                          <td className="table-td">
+                            {item?.item_description}
+                          </td>
+                          <td className="table-td">
+                            Rp {item?.price.toLocaleString("id-ID")}
+                          </td>
+                          <td className="table-td">{item?.quantity}</td>
+                          <td className="table-td">
+                            <span className="text-red-500 font-bold">
+                              {item?.qty_remaining}
+                            </span>
+                          </td>
+
+                          <td className="table-td">
+                            Rp {item?.total_price.toLocaleString("id-ID")}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+                <div className="custom-class flex justify-end mt-4">
+                  <ul className="pagination">
+                    <li>
+                      <button
+                        className="text-xl leading-4 text-slate-900 dark:text-white h-6  w-6 flex  items-center justify-center flex-col prev-next-btn "
+                        onClick={handleFirstPagination}
+                      >
+                        <Icon icon="heroicons-outline:chevron-double-left" />
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        className="text-xl leading-4 text-slate-900 dark:text-white h-6  w-6 flex  items-center justify-center flex-col prev-next-btn "
+                        onClick={handlePrevPagination}
+                      >
+                        <Icon icon="heroicons-outline:chevron-left" />
+                      </button>
+                    </li>
+
+                    {generatePageNumbers().map((pageNumber) => (
+                      <li key={pageNumber.page}>
+                        <button
+                          className={`${pageNumber.active ? "active" : ""
+                            } page-link`}
+                          onClick={() =>
+                            setQuery({ ...query, page: pageNumber.page })
+                          }
+                        >
+                          {pageNumber.page}
+                        </button>
+                      </li>
+                    ))}
+
+                    <li>
+                      <button
+                        className="text-xl leading-4 text-slate-900 dark:text-white h-6  w-6 flex  items-center justify-center flex-col prev-next-btn "
+                        onClick={handleNextPagination}
+                      >
+                        <Icon icon="heroicons-outline:chevron-right" />
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        className="text-xl leading-4 text-slate-900 dark:text-white h-6  w-6 flex  items-center justify-center flex-col prev-next-btn "
+                        onClick={handleLastPagination}
+                      >
+                        <Icon icon="heroicons-outline:chevron-double-right" />
+                      </button>
+                    </li>
+                  </ul>
                 </div>
               </div>
             </Card>
